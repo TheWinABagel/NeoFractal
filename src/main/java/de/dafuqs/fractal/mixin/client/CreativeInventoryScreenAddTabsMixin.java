@@ -38,10 +38,10 @@ public abstract class CreativeInventoryScreenAddTabsMixin extends AbstractInvent
 		if (selected instanceof ItemGroupParent parent && parent.fractal$getChildren() != null && !parent.fractal$getChildren().isEmpty()) {
 			if (!selected.shouldRenderName()) {
 				ItemGroup child = parent.fractal$getSelectedChild();
-				float x = textRenderer.draw(matrices, selected.getName(), this.x + 8, this.y + 6, 4210752);
+				float x = textRenderer.draw(matrices, selected.getDisplayName(), this.x + 8, this.y + 6, 4210752);
 				if (child != null) {
 					x = textRenderer.draw(matrices, " ", x, this.y + 6, 4210752);
-					x = textRenderer.draw(matrices, child.getName(), x, this.y + 6, 4210752);
+					x = textRenderer.draw(matrices, child.getDisplayName(), x, this.y + 6, 4210752);
 				}
 			}
 			int ofs = 5;
@@ -67,7 +67,7 @@ public abstract class CreativeInventoryScreenAddTabsMixin extends AbstractInvent
 				}
 				
 				RenderSystem.setShaderTexture(0, new Identifier("fractal", "textures/tinyfont.png"));
-				String str = child.getName();
+				String str = child.getDisplayName().getString();
 				for (int i = str.length() - 1; i >= 0; i--) {
 					char c = str.charAt(i);
 					if (c > 0x7F) continue;
