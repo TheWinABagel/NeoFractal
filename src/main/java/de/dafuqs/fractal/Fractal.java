@@ -6,7 +6,7 @@ public class Fractal implements ModInitializer {
 	
 	@Override
 	public void onInitialize() {
-
+	
 	}
 	
 }
