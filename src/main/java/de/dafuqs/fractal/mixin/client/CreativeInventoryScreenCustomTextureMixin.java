@@ -24,6 +24,8 @@ public abstract class CreativeInventoryScreenCustomTextureMixin {
 	@Shadow
 	private static ItemGroup selectedTab;
 	
+	@Shadow protected abstract boolean hasScrollbar();
+	
 	@Unique
 	private ItemSubGroup fractal$renderedItemGroup;
 	
@@ -47,7 +49,7 @@ public abstract class CreativeInventoryScreenCustomTextureMixin {
 	private int injectCustomScrollbarTextureU(int original) {
 		ItemSubGroup subGroup = getSelectedSubGroup();
 		if (subGroup == null || subGroup.getBackgroundTexture() == null) return original;
-		return original - 232;
+		return this.hasScrollbar() ? 0 : 12;
 	}
 	
 	@ModifyArg(method = "drawBackground", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/ingame/CreativeInventoryScreen;drawTexture(Lnet/minecraft/client/util/math/MatrixStack;IIIIII)V", ordinal = 1), index = 4)
