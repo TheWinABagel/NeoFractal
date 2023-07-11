@@ -37,6 +37,10 @@ dependencies {
     modCompileOnly "me.shedaniel:RoughlyEnoughItems-api:9.1.520"
 }
 
+loom {
+    accessWidenerPath = file("src/main/resources/fractal.accesswidener")
+}
+
 processResources {
     inputs.property "version", project.version
     inputs.property "minecraft_version", project.minecraft_version

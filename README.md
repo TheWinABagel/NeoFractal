@@ -15,21 +15,23 @@ Fractal introduces item **subgroups for the creative menu**.
 ![Screenshots of the Creative Tabs](images/screenshot_vanilla_style.png)
 
 ```java
-public static final ItemGroup MAIN = FabricItemGroupBuilder.create(new Identifier("mymod", "main"))
-        .icon(() -> new ItemStack(Blocks.REDSTONE_BLOCK))
-        .build()
-        .hideName();
+public static final Identifier GROUP_ID = new Identifier("mymod", "main");
+public static final ItemGroup MAIN = FabricItemGroup.builder(GROUP_ID)
+		.icon(() -> new ItemStack(Blocks.REDSTONE_BLOCK))
+		.entries((displayContext, entries) -> entries.add(Items.APPLE))
+		.noRenderedName()
+		.build();
 
-public static final ItemSubGroup EQUIPMENT = ItemSubGroup.create(MAIN, new Identifier("mymod", "equipment"), ITEM_GROUP_BACKGROUND_TEXTURE_IDENTIFIER);
-public static final ItemSubGroup FUNCTIONAL = ItemSubGroup.create(MAIN, new Identifier("mymod", "functional"), ITEM_GROUP_BACKGROUND_TEXTURE_IDENTIFIER);
-public static final ItemSubGroup CUISINE = ItemSubGroup.create(MAIN, new Identifier("mymod", "cuisine"));
-public static final ItemSubGroup RESOURCES = ItemSubGroup.create(MAIN, new Identifier("mymod", "resources"));
+public static final Item I1 = new Item(new Item.Settings());
+public static final Item I2 = new Item(new Item.Settings());
+public static final Item I3 = new Item(new Item.Settings());
+public static final Item I4 = new Item(new Item.Settings());
 
-public static final Item I1 = new Item(new Item.Settings().group(EQUIPMENT));
-public static final Item I2 = new Item(new Item.Settings().group(FUNCTIONAL));
-public static final Item I3 = new Item(new Item.Settings().group(CUISINE));
-public static final Item I4 = new Item(new Item.Settings().group(RESOURCES));		
- ```
+public static final ItemGroup EQUIPMENT = new ItemSubGroup.Builder(MAIN, Text.translatable("itemGroup.fractal.equipment")).entries((displayContext, entries) -> entries.add(I1)).build();
+public static final ItemGroup FUNCTIONAL = new ItemSubGroup.Builder(MAIN, Text.translatable("itemGroup.fractal.functional")).entries((displayContext, entries) -> entries.add(I2)).build();
+public static final ItemGroup CUISINE = new ItemSubGroup.Builder(MAIN, Text.translatable("itemGroup.fractal.cuisine")).entries((displayContext, entries) -> entries.add(I3)).build();
+public static final ItemGroup RESOURCES = new ItemSubGroup.Builder(MAIN, Text.translatable("itemGroup.fractal.resources")).entries((displayContext, entries) -> entries.add(I4)).build();
+```
 
 ### Applying a custom style
 You are also able to apply a style to your ItemSubGroups, by supplying a custom texture that will be getting used as background for your subgroup. You can even mix and match!
@@ -42,14 +44,8 @@ Just ship a modified [Texture Template](images/tabs_template.png) in your mods r
 ```java
 public static final Identifier ITEM_GROUP_BACKGROUND_TEXTURE_IDENTIFIER = new Identifier("mymod", "textures/item_group.png");
 
-public static final ItemGroup MAIN = FabricItemGroupBuilder.create(new Identifier("mymod", "main"))
-        .icon(() -> new ItemStack(Blocks.REDSTONE_BLOCK))
-        .build()
-        .hideName();
-
-public static final ItemSubGroup EQUIPMENT = ItemSubGroup.create(MAIN, new Identifier("mymod", "equipment"), ITEM_GROUP_BACKGROUND_TEXTURE_IDENTIFIER);
-public static final ItemSubGroup FUNCTIONAL = ItemSubGroup.create(MAIN, new Identifier("mymod", "functional"), ITEM_GROUP_BACKGROUND_TEXTURE_IDENTIFIER);
-public static final ItemSubGroup CUISINE = ItemSubGroup.create(MAIN, new Identifier("mymod", "cuisine"));
-public static final ItemSubGroup RESOURCES = ItemSubGroup.create(MAIN, new Identifier("mymod", "resources"));
-
- ```
+public static final ItemGroup EQUIPMENT = new ItemSubGroup.Builder(MAIN, Text.translatable("itemGroup.mymod.equipment")).backgroundTexture(ITEM_GROUP_BACKGROUND_TEXTURE_IDENTIFIER).entries((displayContext, entries) -> entries.add(I1)).build();
+public static final ItemGroup FUNCTIONAL = new ItemSubGroup.Builder(MAIN, Text.translatable("itemGroup.mymod.functional")).backgroundTexture(ITEM_GROUP_BACKGROUND_TEXTURE_IDENTIFIER).entries((displayContext, entries) -> entries.add(I2)).build();
+public static final ItemGroup CUISINE = new ItemSubGroup.Builder(MAIN, Text.translatable("itemGroup.mymod.cuisine")).entries((displayContext, entries) -> entries.add(I3)).build();
+public static final ItemGroup RESOURCES = new ItemSubGroup.Builder(MAIN, Text.translatable("itemGroup.mymod.resources")).entries((displayContext, entries) -> entries.add(I4)).build();
+```

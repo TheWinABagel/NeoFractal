@@ -1,6 +1,7 @@
 package de.dafuqs.fractal.compat;
 
 import de.dafuqs.fractal.quack.*;
+import de.dafuqs.fractal.mixin.client.*;
 import dev.emi.emi.api.*;
 import dev.emi.emi.api.widget.*;
 import net.minecraft.client.gui.screen.ingame.*;
@@ -12,7 +13,7 @@ public class FractalEMIPlugin implements EmiPlugin {
 	public void register(EmiRegistry registry) {
 		registry.addExclusionArea(CreativeInventoryScreen.class, (screen, out) -> {
 			if (screen != null) {
-				ItemGroup selected = ItemGroup.GROUPS[screen.getSelectedTab()];
+				ItemGroup selected = ((CreativeInventoryScreenAccessor) screen).fractal$getSelectedTab();
 				if (selected instanceof ItemGroupParent parent && screen instanceof SubTabLocation stl && parent.fractal$getChildren() != null && !parent.fractal$getChildren().isEmpty()) {
 					out.accept(new Bounds(stl.fractal$getX(), stl.fractal$getY(), stl.fractal$getW(), stl.fractal$getH()));
 				}

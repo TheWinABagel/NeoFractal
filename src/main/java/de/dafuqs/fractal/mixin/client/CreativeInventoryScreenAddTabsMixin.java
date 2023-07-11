@@ -1,8 +1,8 @@
 package de.dafuqs.fractal.mixin.client;
 
 import com.mojang.blaze3d.systems.*;
-import de.dafuqs.fractal.api.*;
 import de.dafuqs.fractal.quack.*;
+import de.dafuqs.fractal.api.*;
 import net.fabricmc.api.*;
 import net.minecraft.client.gui.screen.ingame.*;
 import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen.*;
@@ -17,7 +17,7 @@ import org.spongepowered.asm.mixin.injection.callback.*;
 
 @Environment(EnvType.CLIENT)
 @Mixin(CreativeInventoryScreen.class)
-public abstract class CreativeInventoryScreenAddTabsMixin extends AbstractInventoryScreen<CreativeScreenHandler> implements SubTabLocation {
+public abstract class CreativeInventoryScreenAddTabsMixin extends AbstractInventoryScreen<CreativeScreenHandler> implements SubTabLocation, CreativeInventoryScreenAccessor {
 	
 	public CreativeInventoryScreenAddTabsMixin(CreativeScreenHandler screenHandler, PlayerInventory playerInventory, Text text) {
 		super(screenHandler, playerInventory, text);
@@ -27,21 +27,19 @@ public abstract class CreativeInventoryScreenAddTabsMixin extends AbstractInvent
 	private float scrollPosition;
 	
 	@Shadow
-	public abstract int getSelectedTab();
-	
+	private static ItemGroup selectedTab;
 	@Unique
 	private int fractal$x, fractal$y, fractal$w, fractal$h;
 	
 	@Inject(at = @At(value = "INVOKE", target = "net/minecraft/client/gui/screen/ingame/CreativeInventoryScreen.drawMouseoverTooltip(Lnet/minecraft/client/util/math/MatrixStack;II)V"), method = "render")
 	public void fractal$render(MatrixStack matrices, int mouseX, int mouseY, float delta, CallbackInfo ci) {
-		ItemGroup selected = ItemGroup.GROUPS[this.getSelectedTab()];
-		if (selected instanceof ItemGroupParent parent && parent.fractal$getChildren() != null && !parent.fractal$getChildren().isEmpty()) {
-			if (!selected.shouldRenderName()) {
+		if (selectedTab instanceof ItemGroupParent parent && parent.fractal$getChildren() != null && !parent.fractal$getChildren().isEmpty()) {
+			if (!selectedTab.shouldRenderName()) {
 				ItemGroup child = parent.fractal$getSelectedChild();
-				float x = textRenderer.draw(matrices, selected.getName(), this.x + 8, this.y + 6, 4210752);
+				float x = textRenderer.draw(matrices, selectedTab.getDisplayName(), this.x + 8, this.y + 6, 4210752);
 				if (child != null) {
 					x = textRenderer.draw(matrices, " ", x, this.y + 6, 4210752);
-					x = textRenderer.draw(matrices, child.getName(), x, this.y + 6, 4210752);
+					x = textRenderer.draw(matrices, child.getDisplayName(), x, this.y + 6, 4210752);
 				}
 			}
 			int ofs = 5;
@@ -54,7 +52,7 @@ public abstract class CreativeInventoryScreenAddTabsMixin extends AbstractInvent
 				RenderSystem.setShaderColor(1, 1, 1, 1);
 				
 				boolean thisChildSelected = child == parent.fractal$getSelectedChild();
-				if(child.getBackgroundTexture() == null) {
+				if (child.getBackgroundTexture() == null) {
 					RenderSystem.setShaderTexture(0, new Identifier("fractal", "textures/subtab.png"));
 					int bgV = thisChildSelected ? 11 : 0;
 					drawTexture(matrices, x - tw, y, 0, bgV, tw + ofs, 11, 70, 22);
@@ -67,7 +65,7 @@ public abstract class CreativeInventoryScreenAddTabsMixin extends AbstractInvent
 				}
 				
 				RenderSystem.setShaderTexture(0, new Identifier("fractal", "textures/tinyfont.png"));
-				String str = child.getName();
+				String str = child.getDisplayName().getString();
 				for (int i = str.length() - 1; i >= 0; i--) {
 					char c = str.charAt(i);
 					if (c > 0x7F) continue;
@@ -88,7 +86,7 @@ public abstract class CreativeInventoryScreenAddTabsMixin extends AbstractInvent
 	
 	@Inject(at = @At("HEAD"), method = "mouseClicked", cancellable = true)
 	public void fractal$mouseClicked(double mouseX, double mouseY, int button, CallbackInfoReturnable<Boolean> ci) {
-		ItemGroup selected = ItemGroup.GROUPS[this.getSelectedTab()];
+		ItemGroup selected = selectedTab;
 		if (selected instanceof ItemGroupParent parent && parent.fractal$getChildren() != null && !parent.fractal$getChildren().isEmpty()) {
 			int x = fractal$x;
 			int y = fractal$y;
@@ -96,8 +94,10 @@ public abstract class CreativeInventoryScreenAddTabsMixin extends AbstractInvent
 			for (ItemSubGroup child : parent.fractal$getChildren()) {
 				if (mouseX >= x && mouseX <= x + w && mouseY >= y && mouseY <= y + 11) {
 					parent.fractal$setSelectedChild(child);
+					
 					handler.itemList.clear();
-					selected.appendStacks(handler.itemList);
+					handler.itemList.addAll(selected.getDisplayStacks());
+					
 					this.scrollPosition = 0.0F;
 					handler.scrollItems(0.0F);
 					ci.setReturnValue(true);

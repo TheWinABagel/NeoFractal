@@ -25,9 +25,10 @@
   "mixins": [
     "fractal.mixins.json"
   ],
+  "accessWidener": "fractal.accesswidener",
   "depends": {
-    "fabricloader": ">=${loader_version}",
-    "fabric": "*",
-    "minecraft": ">=${minecraft_version}"
+    "minecraft": ">=${minecraft_version}",
+    "fabricloader": "*",
+    "fabric": "*"
   }
 }

@@ -2,6 +2,7 @@ package de.dafuqs.fractal.mixin.client;
 
 import net.fabricmc.api.*;
 import net.minecraft.client.gui.screen.ingame.*;
+import net.minecraft.item.*;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.gen.*;
 
@@ -9,7 +10,7 @@ import org.spongepowered.asm.mixin.gen.*;
 @Mixin(CreativeInventoryScreen.class)
 public interface CreativeInventoryScreenAccessor {
 	
-	@Accessor(value = "selectedTab")
-	int getSelectedTab();
+	@Accessor("selectedTab")
+	ItemGroup fractal$getSelectedTab();
 	
 }

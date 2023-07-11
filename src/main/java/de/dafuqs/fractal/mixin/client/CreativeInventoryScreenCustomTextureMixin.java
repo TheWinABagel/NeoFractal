@@ -1,8 +1,8 @@
 package de.dafuqs.fractal.mixin.client;
 
 import com.mojang.blaze3d.systems.*;
-import de.dafuqs.fractal.api.*;
 import de.dafuqs.fractal.quack.*;
+import de.dafuqs.fractal.api.*;
 import net.fabricmc.api.*;
 import net.minecraft.client.gui.screen.ingame.*;
 import net.minecraft.client.util.math.*;
@@ -22,7 +22,7 @@ public abstract class CreativeInventoryScreenCustomTextureMixin {
 	private static Identifier TEXTURE;
 	
 	@Shadow
-	private static int selectedTab;
+	private static ItemGroup selectedTab;
 	
 	@Unique
 	private ItemSubGroup fractal$renderedItemGroup;
@@ -78,7 +78,7 @@ public abstract class CreativeInventoryScreenCustomTextureMixin {
 	private int injectCustomTabTextureLocation(int original) {
 		if (fractal$renderedItemGroup == null || fractal$renderedItemGroup.getBackgroundTexture() == null)
 			return original;
-		return ItemGroup.GROUPS[selectedTab].getColumn() == 0 ? 195 : 223;
+		return selectedTab.getColumn() == 0 ? 195 : 223;
 	}
 	
 	@Inject(method = "renderTabIcon", at = @At("RETURN"))
@@ -92,8 +92,7 @@ public abstract class CreativeInventoryScreenCustomTextureMixin {
 	
 	@Unique
 	private @Nullable ItemSubGroup getSelectedSubGroup() {
-		ItemGroup selectedGroup = ItemGroup.GROUPS[selectedTab];
-		return selectedGroup instanceof ItemGroupParent itemGroupParent ? itemGroupParent.fractal$getSelectedChild() : null;
+		return selectedTab instanceof ItemGroupParent itemGroupParent ? itemGroupParent.fractal$getSelectedChild() : null;
 	}
 	
 }
