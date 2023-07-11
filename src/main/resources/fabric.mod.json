@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "id": "fractal",
+  "version": "${version}",
+  "name": "Fractal",
+  "description": "Adds item subgroups.",
+  "authors": [ "unascribed" ],
+  "contact": {
+    "repo": "https://github.com/DaFuqs/fractal"
+  },
+  "license": "MIT",
+  "icon": "assets/fractal/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "de.dafuqs.fractal.Fractal"
+    ],
+    "emi": [
+      "de.dafuqs.fractal.compat.FractalEMIPlugin"
+    ],
+    "rei_client": [
+      "de.dafuqs.fractal.compat.FractalREIPlugin"
+    ]
+  },
+  "mixins": [
+    "fractal.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric": "*",
+    "minecraft": ">=${minecraft_version}"
+  }
+}
