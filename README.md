@@ -4,9 +4,12 @@ This repo is a fork of [lib39/fractal](https://git.sleeping.town/unascribed-mods
 Fractal introduces item **subgroups for the creative menu**.
 
 ### Why Fractal?
-
 - Fractals Subgroups are very condensed, allowing you to add up to 12 subgroups for each of your tabs
 - Creating a new ItemSubGroup only takes one line of code and no changes in the way you assign your items to groups. Just pass them the ItemSubGroup instead of your main item group
+
+### Limitations
+- More than 12 subgroups per item group, while fully functional, will look weird.
+- The tiny font used for the labels does not support full unicode
 
 ## Examples
 
