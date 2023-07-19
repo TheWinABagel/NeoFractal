@@ -1,3 +1,8 @@
 accessWidener	v1	named
 
 accessible method net/minecraft/item/ItemGroup <init> (Lnet/minecraft/item/ItemGroup$Row;ILnet/minecraft/item/ItemGroup$Type;Lnet/minecraft/text/Text;Ljava/util/function/Supplier;Lnet/minecraft/item/ItemGroup$EntryCollector;)V
+accessible class net/minecraft/item/ItemGroup$EntriesImpl
+accessible field net/minecraft/item/ItemGroup$DisplayContext enabledFeatures Lnet/minecraft/resource/featuretoggle/FeatureSet;
+accessible field net/minecraft/item/ItemGroup entryCollector Lnet/minecraft/item/ItemGroup$EntryCollector;
+accessible field net/minecraft/item/ItemGroup displayStacks Ljava/util/Collection;
+accessible field net/minecraft/item/ItemGroup searchTabStacks Ljava/util/Set;

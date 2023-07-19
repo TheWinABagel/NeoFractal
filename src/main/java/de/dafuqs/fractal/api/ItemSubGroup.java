@@ -2,6 +2,7 @@ package de.dafuqs.fractal.api;
 
 import de.dafuqs.fractal.quack.*;
 import net.minecraft.item.*;
+import net.minecraft.registry.*;
 import net.minecraft.text.*;
 import net.minecraft.util.*;
 import org.jetbrains.annotations.*;
@@ -12,9 +13,9 @@ public class ItemSubGroup extends ItemGroup {
 	
 	public static final List<ItemSubGroup> SUB_GROUPS = new ArrayList<>();
 	
-	private final ItemGroup parent;
-	private final int indexInParent;
-	private final @Nullable Identifier backgroundTexture;
+	protected final ItemGroup parent;
+	protected final int indexInParent;
+	protected final @Nullable Identifier backgroundTexture;
 	
 	protected ItemSubGroup(ItemGroup parent, Text displayName, @Nullable Identifier backgroundTexture, EntryCollector entryCollector) {
 		super(parent.getRow(), parent.getColumn(), parent.getType(), displayName, () -> ItemStack.EMPTY, entryCollector);
@@ -28,17 +29,30 @@ public class ItemSubGroup extends ItemGroup {
 		}
 	}
 	
+	/**
+	 * 100 % the vanilla code, but the check for registered item groups was removed
+	 * (we do not want to register our subgroups, so other mods do not pick them up)
+	 */
+	@Override
+	public void updateEntries(DisplayContext displayContext) {
+		EntriesImpl entriesImpl = new EntriesImpl(this, displayContext.enabledFeatures);
+		this.entryCollector.accept(displayContext, entriesImpl);
+		this.displayStacks = entriesImpl.parentTabStacks;
+		this.searchTabStacks = entriesImpl.searchTabStacks;
+		this.reloadSearchProvider();
+	}
+	
+	@Override
+	public ItemStack getIcon() {
+		return ItemStack.EMPTY;
+	}
+	
 	public ItemGroup getParent() {
 		return parent;
 	}
 	
 	public int getIndexInParent() {
 		return indexInParent;
-	}
-	
-	@Override
-	public ItemStack getIcon() {
-		return ItemStack.EMPTY;
 	}
 	
 	public @Nullable Identifier getBackgroundTexture() {

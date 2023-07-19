@@ -4,6 +4,7 @@ import com.mojang.blaze3d.systems.*;
 import de.dafuqs.fractal.quack.*;
 import de.dafuqs.fractal.api.*;
 import net.fabricmc.api.*;
+import net.minecraft.client.gui.*;
 import net.minecraft.client.gui.screen.ingame.*;
 import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen.*;
 import net.minecraft.client.util.math.*;
@@ -19,6 +20,10 @@ import org.spongepowered.asm.mixin.injection.callback.*;
 @Mixin(CreativeInventoryScreen.class)
 public abstract class CreativeInventoryScreenAddTabsMixin extends AbstractInventoryScreen<CreativeScreenHandler> implements SubTabLocation, CreativeInventoryScreenAccessor {
 	
+	@Unique
+	private static Identifier SUBTAB_TEXTURE = new Identifier("fractal", "textures/subtab.png");
+	private static Identifier TINYFONT_TEXTURE = new Identifier("fractal", "textures/tinyfont.png");
+	
 	public CreativeInventoryScreenAddTabsMixin(CreativeScreenHandler screenHandler, PlayerInventory playerInventory, Text text) {
 		super(screenHandler, playerInventory, text);
 	}
@@ -28,18 +33,19 @@ public abstract class CreativeInventoryScreenAddTabsMixin extends AbstractInvent
 	
 	@Shadow
 	private static ItemGroup selectedTab;
+	@Shadow @Final private static Identifier TEXTURE;
 	@Unique
 	private int fractal$x, fractal$y, fractal$w, fractal$h;
 	
-	@Inject(at = @At(value = "INVOKE", target = "net/minecraft/client/gui/screen/ingame/CreativeInventoryScreen.drawMouseoverTooltip(Lnet/minecraft/client/util/math/MatrixStack;II)V"), method = "render")
-	public void fractal$render(MatrixStack matrices, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+	@Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/ingame/CreativeInventoryScreen;renderTabTooltipIfHovered(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/item/ItemGroup;II)Z"))
+	public void fractal$render(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
 		if (selectedTab instanceof ItemGroupParent parent && parent.fractal$getChildren() != null && !parent.fractal$getChildren().isEmpty()) {
 			if (!selectedTab.shouldRenderName()) {
 				ItemGroup child = parent.fractal$getSelectedChild();
-				float x = textRenderer.draw(matrices, selectedTab.getDisplayName(), this.x + 8, this.y + 6, 4210752);
+				int x = context.drawText(textRenderer, selectedTab.getDisplayName(), this.x + 8, this.y + 6, 4210752, false);
 				if (child != null) {
-					x = textRenderer.draw(matrices, " ", x, this.y + 6, 4210752);
-					x = textRenderer.draw(matrices, child.getDisplayName(), x, this.y + 6, 4210752);
+					x = context.drawText(textRenderer, " ", x, this.y + 6, 4210752, false);
+					x = context.drawText(textRenderer, child.getDisplayName(), x, this.y + 6, 4210752, false);
 				}
 			}
 			int ofs = 5;
@@ -49,30 +55,29 @@ public abstract class CreativeInventoryScreenAddTabsMixin extends AbstractInvent
 			fractal$x = x - tw;
 			fractal$y = y;
 			for (ItemSubGroup child : parent.fractal$getChildren()) {
-				RenderSystem.setShaderColor(1, 1, 1, 1);
+				context.setShaderColor(1, 1, 1, 1);
 				
 				boolean thisChildSelected = child == parent.fractal$getSelectedChild();
 				if (child.getBackgroundTexture() == null) {
-					RenderSystem.setShaderTexture(0, new Identifier("fractal", "textures/subtab.png"));
 					int bgV = thisChildSelected ? 11 : 0;
-					drawTexture(matrices, x - tw, y, 0, bgV, tw + ofs, 11, 70, 22);
-					drawTexture(matrices, this.x, y, 64, bgV, 6, 11, 70, 22);
+					
+					context.drawTexture(SUBTAB_TEXTURE, x - tw, y, 0, bgV, tw + ofs, 11, 70, 22);
+					context.drawTexture(SUBTAB_TEXTURE, this.x, y, 64, bgV, 6, 11, 70, 22);
 				} else {
-					RenderSystem.setShaderTexture(0, child.getBackgroundTexture());
+					Identifier backgroundTextureID = child.getBackgroundTexture();
 					int bgV = thisChildSelected ? 136 + 11 : 136;
-					drawTexture(matrices, x - tw, y, 24, bgV, tw + ofs, 11, 256, 256);
-					drawTexture(matrices, this.x, y, 24 + 64, bgV, 6, 11, 256, 256);
+					context.drawTexture(backgroundTextureID,  x - tw, y, 24, bgV, tw + ofs, 11, 256, 256);
+					context.drawTexture(backgroundTextureID, this.x, y, 24 + 64, bgV, 6, 11, 256, 256);
 				}
 				
-				RenderSystem.setShaderTexture(0, new Identifier("fractal", "textures/tinyfont.png"));
 				String str = child.getDisplayName().getString();
 				for (int i = str.length() - 1; i >= 0; i--) {
 					char c = str.charAt(i);
 					if (c > 0x7F) continue;
 					int u = (c % 16) * 4;
 					int v = (c / 16) * 6;
-					RenderSystem.setShaderColor(0, 0, 0, 1);
-					drawTexture(matrices, x, y + 3, u, v, 4, 6, 64, 48);
+					context.setShaderColor(0, 0, 0, 1);
+					context.drawTexture(TINYFONT_TEXTURE, x, y + 3, u, v, 4, 6, 64, 48);
 					x -= 4;
 				}
 				x = this.x - ofs;
@@ -80,7 +85,7 @@ public abstract class CreativeInventoryScreenAddTabsMixin extends AbstractInvent
 			}
 			fractal$w = tw + ofs;
 			fractal$h = y - fractal$y;
-			RenderSystem.setShaderColor(1, 1, 1, 1);
+			context.setShaderColor(1, 1, 1, 1);
 		}
 	}
 	
