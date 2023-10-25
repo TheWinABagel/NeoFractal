@@ -1,17 +1,16 @@
 package de.dafuqs.fractal.mixin.client;
 
-import com.mojang.blaze3d.systems.*;
-import de.dafuqs.fractal.quack.*;
 import de.dafuqs.fractal.api.*;
+import de.dafuqs.fractal.quack.*;
 import net.fabricmc.api.*;
 import net.minecraft.client.gui.*;
 import net.minecraft.client.gui.screen.ingame.*;
 import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen.*;
-import net.minecraft.client.util.math.*;
 import net.minecraft.entity.player.*;
 import net.minecraft.item.*;
 import net.minecraft.text.*;
 import net.minecraft.util.*;
+import org.jetbrains.annotations.*;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.*;
@@ -21,8 +20,7 @@ import org.spongepowered.asm.mixin.injection.callback.*;
 public abstract class CreativeInventoryScreenAddTabsMixin extends AbstractInventoryScreen<CreativeScreenHandler> implements SubTabLocation, CreativeInventoryScreenAccessor {
 	
 	@Unique
-	private static Identifier SUBTAB_TEXTURE = new Identifier("fractal", "textures/subtab.png");
-	private static Identifier TINYFONT_TEXTURE = new Identifier("fractal", "textures/tinyfont.png");
+	private static Identifier TINYFONT_TEXTURE = new Identifier("fractal", "textures/gui/tinyfont.png");
 	
 	public CreativeInventoryScreenAddTabsMixin(CreativeScreenHandler screenHandler, PlayerInventory playerInventory, Text text) {
 		super(screenHandler, playerInventory, text);
@@ -33,7 +31,7 @@ public abstract class CreativeInventoryScreenAddTabsMixin extends AbstractInvent
 	
 	@Shadow
 	private static ItemGroup selectedTab;
-	@Shadow @Final private static Identifier TEXTURE;
+	
 	@Unique
 	private int fractal$x, fractal$y, fractal$w, fractal$h;
 	
@@ -51,25 +49,22 @@ public abstract class CreativeInventoryScreenAddTabsMixin extends AbstractInvent
 			int ofs = 5;
 			int x = this.x - ofs;
 			int y = this.y + 6;
-			int tw = 56;
+			int tw = 61;
 			fractal$x = x - tw;
 			fractal$y = y;
 			for (ItemSubGroup child : parent.fractal$getChildren()) {
 				context.setShaderColor(1, 1, 1, 1);
 				
+				// draw the background
 				boolean thisChildSelected = child == parent.fractal$getSelectedChild();
-				if (child.getBackgroundTexture() == null) {
-					int bgV = thisChildSelected ? 11 : 0;
-					
-					context.drawTexture(SUBTAB_TEXTURE, x - tw, y, 0, bgV, tw + ofs, 11, 70, 22);
-					context.drawTexture(SUBTAB_TEXTURE, this.x, y, 64, bgV, 6, 11, 70, 22);
-				} else {
-					Identifier backgroundTextureID = child.getBackgroundTexture();
-					int bgV = thisChildSelected ? 136 + 11 : 136;
-					context.drawTexture(backgroundTextureID,  x - tw, y, 24, bgV, tw + ofs, 11, 256, 256);
-					context.drawTexture(backgroundTextureID, this.x, y, 24 + 64, bgV, 6, 11, 256, 256);
-				}
+				@Nullable ItemSubGroup.Style style = child.getStyle();
+				@Nullable Identifier subtabTextureID = style == null
+						? (thisChildSelected ? ItemSubGroup.SUBTAB_SELECTED_TEXTURE : ItemSubGroup.SUBTAB_UNSELECTED_TEXTURE)
+						: (thisChildSelected ? style.subtabSelectedTexture() : style.subtabUnselectedTexture());
 				
+				context.drawGuiTexture(subtabTextureID, fractal$x, fractal$y, 69, 11);
+				
+				// draw the text
 				String str = child.getDisplayName().getString();
 				for (int i = str.length() - 1; i >= 0; i--) {
 					char c = str.charAt(i);

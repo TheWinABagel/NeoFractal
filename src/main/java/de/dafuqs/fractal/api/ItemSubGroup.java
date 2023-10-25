@@ -2,10 +2,10 @@ package de.dafuqs.fractal.api;
 
 import de.dafuqs.fractal.quack.*;
 import net.minecraft.item.*;
-import net.minecraft.registry.*;
 import net.minecraft.text.*;
 import net.minecraft.util.*;
 import org.jetbrains.annotations.*;
+import org.spongepowered.asm.mixin.*;
 
 import java.util.*;
 
@@ -15,11 +15,34 @@ public class ItemSubGroup extends ItemGroup {
 	
 	protected final ItemGroup parent;
 	protected final int indexInParent;
-	protected final @Nullable Identifier backgroundTexture;
+	protected final Style style;
 	
-	protected ItemSubGroup(ItemGroup parent, Text displayName, @Nullable Identifier backgroundTexture, EntryCollector entryCollector) {
+	public record Style(@Nullable Identifier backgroundTexture,
+						@Nullable Identifier enabledScrollbarTexture,
+						@Nullable Identifier disabledScrollbarTexture,
+						@Nullable Identifier tabTopFirstSelectedTexture,
+						@Nullable Identifier tabTopSelectedTexture,
+						@Nullable Identifier tabTopUnselectedTexture,
+						@Nullable Identifier tabBottomFirstSelectedTexture,
+						@Nullable Identifier tabBottomSelectedTexture,
+						@Nullable Identifier tabBottomUnselectedTexture,
+						@Nullable Identifier subtabSelectedTexture,
+						@Nullable Identifier subtabUnselectedTexture) {
+		
+	}
+	
+	public static final Identifier SUBTAB_SELECTED_TEXTURE = new Identifier("fractal", "container/creative_inventory/subtab_selected");
+	public static final Identifier SUBTAB_UNSELECTED_TEXTURE = new Identifier("fractal", "container/creative_inventory/subtab_unselected");
+	
+	public static final Style VANILLA_STYLE = new Style(null, null, null, null, null, null, null, null, null, null, null);
+	
+	protected ItemSubGroup(ItemGroup parent, Text displayName, EntryCollector entryCollector) {
+		this(parent, displayName, entryCollector, VANILLA_STYLE);
+	}
+	
+	protected ItemSubGroup(ItemGroup parent, Text displayName, EntryCollector entryCollector, Style style) {
 		super(parent.getRow(), parent.getColumn(), parent.getType(), displayName, () -> ItemStack.EMPTY, entryCollector);
-		this.backgroundTexture = backgroundTexture;
+		this.style = style;
 		this.parent = parent;
 		ItemGroupParent igp = (ItemGroupParent) parent;
 		this.indexInParent = igp.fractal$getChildren().size();
@@ -55,15 +78,15 @@ public class ItemSubGroup extends ItemGroup {
 		return indexInParent;
 	}
 	
-	public @Nullable Identifier getBackgroundTexture() {
-		return this.backgroundTexture;
+	public Style getStyle() {
+		return style;
 	}
 	
 	public static class Builder {
 		
 		protected ItemGroup parent;
 		protected Text displayName;
-		protected Identifier backgroundTexture;
+		protected Style style;
 		private EntryCollector entryCollector;
 		
 		public Builder(ItemGroup parent, Text displayName) {
@@ -71,8 +94,8 @@ public class ItemSubGroup extends ItemGroup {
 			this.displayName = displayName;
 		}
 		
-		public Builder backgroundTexture(Identifier texture) {
-			this.backgroundTexture = texture;
+		public Builder styled(Style style) {
+			this.style = style;
 			return this;
 		}
 		
@@ -82,7 +105,7 @@ public class ItemSubGroup extends ItemGroup {
 		}
 		
 		public ItemSubGroup build() {
-			ItemSubGroup subGroup = new ItemSubGroup(parent, displayName, backgroundTexture, entryCollector);
+			ItemSubGroup subGroup = new ItemSubGroup(parent, displayName, entryCollector, style);
 			SUB_GROUPS.add(subGroup);
 			return subGroup;
 		}

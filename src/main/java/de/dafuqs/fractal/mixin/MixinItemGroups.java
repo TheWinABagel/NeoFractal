@@ -11,7 +11,7 @@ public class MixinItemGroups {
 	
 	@Inject(at = @At("HEAD"), method = "updateEntries")
 	private static void updateEntries(ItemGroup.DisplayContext displayContext, CallbackInfo ci) {
-		ItemSubGroup.SUB_GROUPS.stream().forEach((group) -> {
+		ItemSubGroup.SUB_GROUPS.forEach((group) -> {
 			group.updateEntries(displayContext);
 		});
 	}
