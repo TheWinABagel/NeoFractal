@@ -49,22 +49,20 @@ public abstract class CreativeInventoryScreenAddTabsMixin extends AbstractInvent
 			int ofs = 5;
 			int x = this.x - ofs;
 			int y = this.y + 6;
-			int tw = 61;
+			int tw = 57;
 			fractal$x = x - tw;
 			fractal$y = y;
 			for (ItemSubGroup child : parent.fractal$getChildren()) {
 				context.setShaderColor(1, 1, 1, 1);
 				
-				// draw the background
 				boolean thisChildSelected = child == parent.fractal$getSelectedChild();
 				@Nullable ItemSubGroup.Style style = child.getStyle();
 				@Nullable Identifier subtabTextureID = style == null
 						? (thisChildSelected ? ItemSubGroup.SUBTAB_SELECTED_TEXTURE : ItemSubGroup.SUBTAB_UNSELECTED_TEXTURE)
-						: (thisChildSelected ? style.subtabSelectedTexture() : style.subtabUnselectedTexture());
+						: (thisChildSelected ? style.selectedSubtabTexture() : style.unselectedSubtabTexture());
 				
-				context.drawGuiTexture(subtabTextureID, fractal$x, fractal$y, 69, 11);
+				context.drawGuiTexture(subtabTextureID, x - tw, y, 70, 11);
 				
-				// draw the text
 				String str = child.getDisplayName().getString();
 				for (int i = str.length() - 1; i >= 0; i--) {
 					char c = str.charAt(i);

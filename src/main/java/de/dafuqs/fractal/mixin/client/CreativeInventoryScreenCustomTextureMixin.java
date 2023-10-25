@@ -28,13 +28,13 @@ public abstract class CreativeInventoryScreenCustomTextureMixin {
 	private ItemGroup fractal$renderedItemGroup;
 	
 	// BACKGROUND
-	
 	@ModifyArg(method = "drawBackground", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawTexture(Lnet/minecraft/util/Identifier;IIIIII)V", ordinal = 0))
 	private Identifier injectCustomGroupTexture(Identifier original) {
 		ItemSubGroup subGroup = getSelectedSubGroup();
 		return (subGroup == null || subGroup.getStyle() == null || subGroup.getStyle().backgroundTexture() == null) ? original : subGroup.getStyle().backgroundTexture();
 	}
 	
+	// SCROLLBAR
 	@ModifyArgs(method = "drawBackground", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawGuiTexture(Lnet/minecraft/util/Identifier;IIII)V"))
 	private void injectCustomScrollbarTexture(org.spongepowered.asm.mixin.injection.invoke.arg.Args args) {
 		ItemSubGroup subGroup = getSelectedSubGroup();
@@ -47,7 +47,6 @@ public abstract class CreativeInventoryScreenCustomTextureMixin {
 	}
 	
 	// ICON
-	
 	@Inject(method = "renderTabIcon", at = @At("HEAD"))
 	private void captureContextGroup(DrawContext context, ItemGroup group, CallbackInfo ci) {
 		this.fractal$renderedItemGroup = group;
@@ -64,9 +63,14 @@ public abstract class CreativeInventoryScreenCustomTextureMixin {
 			return original;
 		}
 		
-		return this.fractal$renderedItemGroup.getRow() == ItemGroup.Row.TOP
-				? selectedTab == this.fractal$renderedItemGroup ? this.fractal$renderedItemGroup.getColumn() == 0 ? style.tabTopFirstSelectedTexture() : style.tabTopSelectedTexture() : style.tabTopUnselectedTexture()
-				: selectedTab == this.fractal$renderedItemGroup ? this.fractal$renderedItemGroup.getColumn() == 0 ? style.tabBottomFirstSelectedTexture() : style.tabBottomSelectedTexture() : style.tabBottomUnselectedTexture();
+		boolean onTop = this.fractal$renderedItemGroup.getRow() == ItemGroup.Row.TOP;
+		boolean isSelected = selectedTab == this.fractal$renderedItemGroup;
+		
+		Identifier texture = onTop
+				? isSelected ? this.fractal$renderedItemGroup.getColumn() == 0 ? style.tabTopFirstSelectedTexture() : style.tabTopSelectedTexture() : style.tabTopUnselectedTexture()
+				: isSelected ? this.fractal$renderedItemGroup.getColumn() == 0 ? style.tabBottomFirstSelectedTexture() : style.tabBottomSelectedTexture() : style.tabBottomUnselectedTexture();
+		
+		return texture == null ? original : texture;
 	}
 	
 	@Unique
