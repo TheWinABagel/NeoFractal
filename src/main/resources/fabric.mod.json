@@ -30,5 +30,10 @@
     "minecraft": ">=${minecraft_version}",
     "fabricloader": "*",
     "fabric": "*"
+  },
+  "custom": {
+    "modmenu": {
+      "badges": [ "library" ]
+    }
   }
 }
