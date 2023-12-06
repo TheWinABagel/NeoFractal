@@ -1,4 +1,4 @@
-package de.dafuqs.fractal.quack;
+package de.dafuqs.fractal.interfaces;
 
 public interface SubTabLocation {
 	
