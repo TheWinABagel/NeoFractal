@@ -1,13 +1,11 @@
 package de.dafuqs.fractal.mixin.client;
 
-import com.mojang.blaze3d.systems.*;
-import de.dafuqs.fractal.quack.*;
+import de.dafuqs.fractal.interfaces.*;
 import de.dafuqs.fractal.api.*;
 import net.fabricmc.api.*;
 import net.minecraft.client.gui.*;
 import net.minecraft.client.gui.screen.ingame.*;
 import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen.*;
-import net.minecraft.client.util.math.*;
 import net.minecraft.entity.player.*;
 import net.minecraft.item.*;
 import net.minecraft.text.*;

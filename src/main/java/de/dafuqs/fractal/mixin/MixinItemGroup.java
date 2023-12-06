@@ -1,7 +1,7 @@
 package de.dafuqs.fractal.mixin;
 
 import com.google.common.collect.*;
-import de.dafuqs.fractal.quack.*;
+import de.dafuqs.fractal.interfaces.*;
 import de.dafuqs.fractal.api.*;
 import net.minecraft.item.*;
 import org.spongepowered.asm.mixin.*;

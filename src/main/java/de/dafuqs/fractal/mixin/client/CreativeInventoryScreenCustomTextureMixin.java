@@ -1,6 +1,6 @@
 package de.dafuqs.fractal.mixin.client;
 
-import de.dafuqs.fractal.quack.*;
+import de.dafuqs.fractal.interfaces.*;
 import de.dafuqs.fractal.api.*;
 import net.fabricmc.api.*;
 import net.minecraft.client.gui.*;
