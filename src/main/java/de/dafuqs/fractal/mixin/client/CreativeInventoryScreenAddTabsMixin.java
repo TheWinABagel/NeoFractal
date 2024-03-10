@@ -49,42 +49,45 @@ public abstract class CreativeInventoryScreenAddTabsMixin extends AbstractInvent
 			}
 			int ofs = 5;
 
-			int[] pos = {this.x - ofs, this.y + 6};
-			int tw = 56;
-			fractal$x = pos[0] - tw;
+			int[] pos = {this.x, this.y + 6};
+			int tabStartOffset = 67;
+			int tabWidth = 70;
+			fractal$x = pos[0] - tabWidth;
 			fractal$y = pos[1];
 			for (ItemSubGroup child : parent.fractal$getChildren()) {
 				context.setShaderColor(1, 1, 1, 1);
 				
 				boolean thisChildSelected = child == parent.fractal$getSelectedChild();
+				
 				if (child.getBackgroundTexture() == null) {
 					int bgV = thisChildSelected ? 11 : 0;
 					
-					context.drawTexture(SUBTAB_TEXTURE, pos[0] - tw, pos[1], 0, bgV, tw + ofs, 11, 70, 22);
-					context.drawTexture(SUBTAB_TEXTURE, this.x, pos[1], 64, bgV, 6, 11, 70, 22);
+					context.drawTexture(SUBTAB_TEXTURE, pos[0] - tabStartOffset, pos[1], 0, bgV, tabWidth, 11, tabWidth, 44);
 				} else {
 					Identifier backgroundTextureID = child.getBackgroundTexture();
 					int bgV = thisChildSelected ? 136 + 11 : 136;
-					context.drawTexture(backgroundTextureID,  pos[0] - tw, pos[1], 24, bgV, tw + ofs, 11, 256, 256);
-					context.drawTexture(backgroundTextureID, this.x, pos[1], 24 + 64, bgV, 6, 11, 256, 256);
+					context.drawTexture(backgroundTextureID,  pos[0] - tabStartOffset, pos[1], 24, bgV, tabWidth, 11, 256, 256);
 				}
 				
-				String str = child.getDisplayName().getString();
+				int textOffset = thisChildSelected ? 8 : 5; // makes the text pop slightly outwards
+				String tabDisplayName = child.getDisplayName().getString();
 				context.draw(() -> {
-					for (int i = str.length() - 1; i >= 0; i--) {
-						char c = str.charAt(i);
+					for (int i = tabDisplayName.length() - 1; i >= 0; i--) {
+						char c = tabDisplayName.charAt(i);
 						if (c > 0x7F) continue;
 						int u = (c % 16) * 4;
 						int v = (c / 16) * 6;
 						context.setShaderColor(0, 0, 0, 1);
-						context.drawTexture(TINYFONT_TEXTURE, pos[0], pos[1] + 3, u, v, 4, 6, 64, 48);
+						context.drawTexture(TINYFONT_TEXTURE, pos[0] - textOffset, pos[1] + 3, u, v, 4, 6, 64, 48);
 						pos[0] -= 4;
 					}
 				});
-				pos[0] = this.x - ofs;
+				
+				pos[0] = this.x;
 				pos[1] += 10;
 			}
-			fractal$w = tw + ofs;
+			
+			fractal$w = tabWidth + ofs;
 			fractal$h = pos[1] - fractal$y;
 			context.setShaderColor(1, 1, 1, 1);
 		}
