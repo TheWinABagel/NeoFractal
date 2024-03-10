@@ -8,9 +8,9 @@
     "MixinItemGroups"
   ],
   "client": [
+    "client.CreativeInventoryScreenAccessor",
     "client.CreativeInventoryScreenAddTabsMixin",
-    "client.CreativeInventoryScreenCustomTextureMixin",
-    "client.CreativeInventoryScreenAccessor"
+    "client.CreativeInventoryScreenCustomTextureMixin"
   ],
   "injectors": {
     "defaultRequire": 1

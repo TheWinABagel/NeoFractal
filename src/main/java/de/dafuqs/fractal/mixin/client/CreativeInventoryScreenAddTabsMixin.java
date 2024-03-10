@@ -32,7 +32,7 @@ public abstract class CreativeInventoryScreenAddTabsMixin extends AbstractInvent
 	
 	@Shadow
 	private static ItemGroup selectedTab;
-	@Shadow @Final private static Identifier TEXTURE;
+	
 	@Unique
 	private int fractal$x, fractal$y, fractal$w, fractal$h;
 	
