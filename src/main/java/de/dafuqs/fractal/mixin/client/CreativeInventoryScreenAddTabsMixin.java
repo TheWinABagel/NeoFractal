@@ -21,7 +21,7 @@ import java.util.*;
 public abstract class CreativeInventoryScreenAddTabsMixin extends AbstractInventoryScreen<CreativeScreenHandler> implements SubTabLocation, CreativeInventoryScreenAccessor {
 	
 	@Unique
-	private static final int FIRST_TAB_INDEX_RENDERING_RIGHT = 2;
+	private static final int LAST_TAB_INDEX_RENDERING_LEFT = 11;
 	
 	@Unique
 	private static final Identifier SUBTAB_TEXTURE = new Identifier("fractal", "textures/subtab.png");
@@ -106,10 +106,10 @@ public abstract class CreativeInventoryScreenAddTabsMixin extends AbstractInvent
 				}
 				
 				int index = child.getIndexInParent();
-				if(index >= FIRST_TAB_INDEX_RENDERING_RIGHT) {
-					if(index == FIRST_TAB_INDEX_RENDERING_RIGHT) {
+				if(index >= LAST_TAB_INDEX_RENDERING_LEFT) {
+					if(index == LAST_TAB_INDEX_RENDERING_LEFT) {
 						rendersOnTheRight = true;
-						pos[1] -= 10 * (FIRST_TAB_INDEX_RENDERING_RIGHT + 1);
+						pos[1] -= 10 * (LAST_TAB_INDEX_RENDERING_LEFT + 1);
 					}
 					pos[0] = fractal$x2;
 				} else {
@@ -118,8 +118,8 @@ public abstract class CreativeInventoryScreenAddTabsMixin extends AbstractInvent
 				pos[1] += 10;
 			}
 			
-			fractal$h = 11 * Math.min(FIRST_TAB_INDEX_RENDERING_RIGHT + 1, children.size());
-			fractal$h2 = 11 * Math.max(0, children.size() - FIRST_TAB_INDEX_RENDERING_RIGHT - 1);
+			fractal$h = 11 * Math.min(LAST_TAB_INDEX_RENDERING_LEFT + 1, children.size());
+			fractal$h2 = 11 * Math.max(0, children.size() - LAST_TAB_INDEX_RENDERING_LEFT - 1);
 
 			context.setShaderColor(1, 1, 1, 1);
 		}
@@ -146,7 +146,7 @@ public abstract class CreativeInventoryScreenAddTabsMixin extends AbstractInvent
 				}
 				y += 10;
 				
-				if(child.getIndexInParent() == FIRST_TAB_INDEX_RENDERING_RIGHT) {
+				if(child.getIndexInParent() == LAST_TAB_INDEX_RENDERING_LEFT) {
 					x += 259;
 					y = fractal$y;
 				}
