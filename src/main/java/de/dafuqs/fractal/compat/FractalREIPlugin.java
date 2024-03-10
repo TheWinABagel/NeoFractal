@@ -17,7 +17,10 @@ public class FractalREIPlugin implements REIClientPlugin {
 		zones.register(CreativeInventoryScreen.class, (screen) -> {
 			ItemGroup selected = CreativeInventoryScreenAccessor.fractal$getSelectedTab();
 			if (selected instanceof ItemGroupParent parent && screen instanceof SubTabLocation stl && parent.fractal$getChildren() != null && !parent.fractal$getChildren().isEmpty()) {
-				return List.of(new Rectangle(stl.fractal$getX(), stl.fractal$getY(), stl.fractal$getW(), stl.fractal$getH()));
+				return List.of(
+						new Rectangle(stl.fractal$getX(), stl.fractal$getY(), 72, stl.fractal$getH()),
+						new Rectangle(stl.fractal$getX2(), stl.fractal$getY(), 72, stl.fractal$getH2())
+				);
 			}
 			return List.of();
 		});

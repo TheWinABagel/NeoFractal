@@ -14,12 +14,14 @@ import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.*;
 
+import java.util.*;
+
 @Environment(EnvType.CLIENT)
 @Mixin(CreativeInventoryScreen.class)
 public abstract class CreativeInventoryScreenAddTabsMixin extends AbstractInventoryScreen<CreativeScreenHandler> implements SubTabLocation, CreativeInventoryScreenAccessor {
 	
 	@Unique
-	private static final int FIRST_TAB_INDEX_RENDERING_RIGHT = 13;
+	private static final int FIRST_TAB_INDEX_RENDERING_RIGHT = 2;
 	
 	@Unique
 	private static final Identifier SUBTAB_TEXTURE = new Identifier("fractal", "textures/subtab.png");
@@ -37,7 +39,9 @@ public abstract class CreativeInventoryScreenAddTabsMixin extends AbstractInvent
 	private static ItemGroup selectedTab;
 	
 	@Unique
-	private int fractal$x, fractal$y, fractal$w, fractal$h;
+	private int fractal$y; // tab start y
+	private int fractal$x, fractal$h; // left tabs
+	private int fractal$x2, fractal$h2; // right tabs
 	
 	@Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/ingame/CreativeInventoryScreen;drawMouseoverTooltip(Lnet/minecraft/client/gui/DrawContext;II)V"))
 	public void fractal$render(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
@@ -50,15 +54,17 @@ public abstract class CreativeInventoryScreenAddTabsMixin extends AbstractInvent
 					x = context.drawText(textRenderer, child.getDisplayName(), x, this.y + 6, 4210752, false);
 				}
 			}
-			int ofs = 5;
 
 			int[] pos = {this.x, this.y + 6};
 			int tabStartOffset = 68;
 			int tabWidth = 72;
+			
 			fractal$x = pos[0] - tabWidth;
 			fractal$y = pos[1];
+			fractal$x2 = pos[0] + 259;
 			boolean rendersOnTheRight = false;
-			for (ItemSubGroup child : parent.fractal$getChildren()) {
+			List<ItemSubGroup> children =  parent.fractal$getChildren();
+			for (ItemSubGroup child : children) {
 				boolean thisChildSelected = child == parent.fractal$getSelectedChild();
 				
 				context.setShaderColor(1, 1, 1, 1);
@@ -105,15 +111,16 @@ public abstract class CreativeInventoryScreenAddTabsMixin extends AbstractInvent
 						rendersOnTheRight = true;
 						pos[1] -= 10 * (FIRST_TAB_INDEX_RENDERING_RIGHT + 1);
 					}
-					pos[0] = this.x + 259;
+					pos[0] = fractal$x2;
 				} else {
 					pos[0] = this.x;
 				}
 				pos[1] += 10;
 			}
 			
-			fractal$w = tabWidth + ofs;
-			fractal$h = pos[1] - fractal$y;
+			fractal$h = 11 * Math.min(FIRST_TAB_INDEX_RENDERING_RIGHT + 1, children.size());
+			fractal$h2 = 11 * Math.max(0, children.size() - FIRST_TAB_INDEX_RENDERING_RIGHT - 1);
+
 			context.setShaderColor(1, 1, 1, 1);
 		}
 	}
@@ -124,7 +131,7 @@ public abstract class CreativeInventoryScreenAddTabsMixin extends AbstractInvent
 		if (selected instanceof ItemGroupParent parent && parent.fractal$getChildren() != null && !parent.fractal$getChildren().isEmpty()) {
 			int x = fractal$x;
 			int y = fractal$y;
-			int w = fractal$w;
+			int w = 77;
 			for (ItemSubGroup child : parent.fractal$getChildren()) {
 				if (mouseX >= x && mouseX <= x + w && mouseY >= y && mouseY <= y + 11) {
 					parent.fractal$setSelectedChild(child);
@@ -158,13 +165,18 @@ public abstract class CreativeInventoryScreenAddTabsMixin extends AbstractInvent
 	}
 	
 	@Override
-	public int fractal$getW() {
-		return fractal$w;
+	public int fractal$getH() {
+		return fractal$h;
 	}
 	
 	@Override
-	public int fractal$getH() {
-		return fractal$h;
+	public int fractal$getX2() {
+		return fractal$x2 - 72;
+	}
+	
+	@Override
+	public int fractal$getH2() {
+		return fractal$h2;
 	}
 	
 }

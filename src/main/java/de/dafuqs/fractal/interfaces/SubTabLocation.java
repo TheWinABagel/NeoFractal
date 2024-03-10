@@ -2,9 +2,14 @@ package de.dafuqs.fractal.interfaces;
 
 public interface SubTabLocation {
 	
-	int fractal$getX();
+	// tab start y
 	int fractal$getY();
-	int fractal$getW();
+	
+	// left
+	int fractal$getX();
 	int fractal$getH();
 	
+	// right
+	int fractal$getX2();
+	int fractal$getH2();
 }
