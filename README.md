@@ -66,3 +66,7 @@ public static final ItemGroup FUNCTIONAL = new ItemSubGroup.Builder(MAIN, Text.t
 public static final ItemGroup CUISINE = new ItemSubGroup.Builder(MAIN, Text.translatable("itemGroup.mymod.cuisine")).entries((displayContext, entries) -> entries.add(I3)).build();
 public static final ItemGroup RESOURCES = new ItemSubGroup.Builder(MAIN, Text.translatable("itemGroup.mymod.resources")).entries((displayContext, entries) -> entries.add(I4)).build();
 ```
+
+### Adding items to existing ItemSubGroups
+
+There exists an API for that! `ItemSubGroupEvents.modifyEntriesEvent(<Identifier of the Subtab you want to modify)` behaves exactly like its Fabric API counterpart, but targets ItemSubGroups instead of ItemGroups (it needs to be a separate event, since ItemSubGroups are not registered item groups, having no RegistryEntry that the Fabric API version targets)
