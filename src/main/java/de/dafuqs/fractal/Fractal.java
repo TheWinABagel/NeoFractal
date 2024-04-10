@@ -1,12 +1,8 @@
 package de.dafuqs.fractal;
 
-import net.fabricmc.api.*;
+import net.neoforged.fml.common.Mod;
 
-public class Fractal implements ModInitializer {
-	
-	@Override
-	public void onInitialize() {
+@Mod("fractal")
+public class Fractal {
 
-	}
-	
 }

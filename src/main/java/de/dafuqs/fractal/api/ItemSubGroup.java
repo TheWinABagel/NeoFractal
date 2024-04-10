@@ -1,88 +1,90 @@
 package de.dafuqs.fractal.api;
 
 import de.dafuqs.fractal.interfaces.*;
-import net.minecraft.item.*;
-import net.minecraft.text.*;
-import net.minecraft.util.*;
-import org.jetbrains.annotations.*;
-import org.spongepowered.asm.mixin.*;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.CreativeModeTab.ItemDisplayBuilder;
+import net.minecraft.world.item.ItemStack;
 
-public class ItemSubGroup extends ItemGroup {
+public class ItemSubGroup extends CreativeModeTab {
 	
 	public static final List<ItemSubGroup> SUB_GROUPS = new ArrayList<>();
 	
-	protected final ItemGroup parent;
+	protected final CreativeModeTab parent;
 	protected final int indexInParent;
 	protected final Style style;
 	
-	public record Style(@Nullable Identifier backgroundTexture,
+	public record Style(@Nullable ResourceLocation backgroundTexture,
 						
-						@Nullable Identifier selectedSubtabTexture,
-						@Nullable Identifier unselectedSubtabTexture,
+						@Nullable ResourceLocation selectedSubtabTexture,
+						@Nullable ResourceLocation unselectedSubtabTexture,
 						
-						@Nullable Identifier enabledScrollbarTexture,
-						@Nullable Identifier disabledScrollbarTexture,
+						@Nullable ResourceLocation enabledScrollbarTexture,
+						@Nullable ResourceLocation disabledScrollbarTexture,
 						 
-						@Nullable Identifier tabTopFirstSelectedTexture,
-						@Nullable Identifier tabTopSelectedTexture,
-						@Nullable Identifier tabTopLastSelectedTexture,
-						@Nullable Identifier tabTopFirstUnselectedTexture,
-						@Nullable Identifier tabTopUnselectedTexture,
-						@Nullable Identifier tabTopLastUnselectedTexture,
-						@Nullable Identifier tabBottomFirstSelectedTexture,
-						@Nullable Identifier tabBottomSelectedTexture,
-						@Nullable Identifier tabBottomLastSelectedTexture,
-						@Nullable Identifier tabBottomFirstUnselectedTexture,
-						@Nullable Identifier tabBottomUnselectedTexture,
-						@Nullable Identifier tabBottomLastUnselectedTexture) {
+						@Nullable ResourceLocation tabTopFirstSelectedTexture,
+						@Nullable ResourceLocation tabTopSelectedTexture,
+						@Nullable ResourceLocation tabTopLastSelectedTexture,
+						@Nullable ResourceLocation tabTopFirstUnselectedTexture,
+						@Nullable ResourceLocation tabTopUnselectedTexture,
+						@Nullable ResourceLocation tabTopLastUnselectedTexture,
+						@Nullable ResourceLocation tabBottomFirstSelectedTexture,
+						@Nullable ResourceLocation tabBottomSelectedTexture,
+						@Nullable ResourceLocation tabBottomLastSelectedTexture,
+						@Nullable ResourceLocation tabBottomFirstUnselectedTexture,
+						@Nullable ResourceLocation tabBottomUnselectedTexture,
+						@Nullable ResourceLocation tabBottomLastUnselectedTexture) {
 		
 		public static class Builder {
 			
-			protected @Nullable Identifier backgroundTexture;
+			protected @Nullable ResourceLocation backgroundTexture;
 			
-			protected @Nullable Identifier selectedSubtabTexture;
-			protected @Nullable Identifier unselectedSubtabTexture;
+			protected @Nullable ResourceLocation selectedSubtabTexture;
+			protected @Nullable ResourceLocation unselectedSubtabTexture;
 			
-			protected @Nullable Identifier enabledScrollbarTexture;
-			protected @Nullable Identifier disabledScrollbarTexture;
+			protected @Nullable ResourceLocation enabledScrollbarTexture;
+			protected @Nullable ResourceLocation disabledScrollbarTexture;
 			
-			protected @Nullable Identifier tabTopFirstSelectedTexture;
-			protected @Nullable Identifier tabTopSelectedTexture;
-			protected @Nullable Identifier tabTopLastSelectedTexture;
-			protected @Nullable Identifier tabTopFirstUnselectedTexture;
-			protected @Nullable Identifier tabTopUnselectedTexture;
-			protected @Nullable Identifier tabTopLastUnselectedTexture;
+			protected @Nullable ResourceLocation tabTopFirstSelectedTexture;
+			protected @Nullable ResourceLocation tabTopSelectedTexture;
+			protected @Nullable ResourceLocation tabTopLastSelectedTexture;
+			protected @Nullable ResourceLocation tabTopFirstUnselectedTexture;
+			protected @Nullable ResourceLocation tabTopUnselectedTexture;
+			protected @Nullable ResourceLocation tabTopLastUnselectedTexture;
 			
-			protected @Nullable Identifier tabBottomFirstSelectedTexture;
-			protected @Nullable Identifier tabBottomSelectedTexture;
-			protected @Nullable Identifier tabBottomLastSelectedTexture;
-			protected @Nullable Identifier tabBottomFirstUnselectedTexture;
-			protected @Nullable Identifier tabBottomUnselectedTexture;
-			protected @Nullable Identifier tabBottomLastUnselectedTexture;
+			protected @Nullable ResourceLocation tabBottomFirstSelectedTexture;
+			protected @Nullable ResourceLocation tabBottomSelectedTexture;
+			protected @Nullable ResourceLocation tabBottomLastSelectedTexture;
+			protected @Nullable ResourceLocation tabBottomFirstUnselectedTexture;
+			protected @Nullable ResourceLocation tabBottomUnselectedTexture;
+			protected @Nullable ResourceLocation tabBottomLastUnselectedTexture;
 			
 			public Builder() { }
 			
-			public Style.Builder background(Identifier backgroundTexture) { // texture
+			public Builder background(ResourceLocation backgroundTexture) { // texture
 				this.backgroundTexture = backgroundTexture;
 				return this;
 			}
 			
-			public Style.Builder scrollbar(Identifier enabledTexture, Identifier disabledTexture) { // sprite
+			public Builder scrollbar(ResourceLocation enabledTexture, ResourceLocation disabledTexture) { // sprite
 				this.enabledScrollbarTexture = enabledTexture;
 				this.disabledScrollbarTexture = disabledTexture;
 				return this;
 			}
 			
-			public Style.Builder subtab(Identifier selectedSubtabTexture, Identifier unselectedSubtabTexture) { // sprite
+			public Builder subtab(ResourceLocation selectedSubtabTexture, ResourceLocation unselectedSubtabTexture) { // sprite
 				this.selectedSubtabTexture = selectedSubtabTexture;
 				this.unselectedSubtabTexture = unselectedSubtabTexture;
 				return this;
 			}
 			
-			public Style.Builder tab(Identifier topFirstSelectedTexture, Identifier topSelectedTexture, Identifier topLastSelectedTexture, Identifier topFirstUnselectedTexture, Identifier topUnselectedTexture, Identifier topLastUnselectedTexture,
-									 Identifier bottomFirstSelectedTexture, Identifier bottomSelectedTexture, Identifier bottomLastSelectedTexture, Identifier bottomFirstUnselectedTexture, Identifier bottomUnselectedTexture, Identifier bottomLastUnselectedTexture) { // sprite
+			public Builder tab(ResourceLocation topFirstSelectedTexture, ResourceLocation topSelectedTexture, ResourceLocation topLastSelectedTexture, ResourceLocation topFirstUnselectedTexture, ResourceLocation topUnselectedTexture, ResourceLocation topLastUnselectedTexture,
+									 ResourceLocation bottomFirstSelectedTexture, ResourceLocation bottomSelectedTexture, ResourceLocation bottomLastSelectedTexture, ResourceLocation bottomFirstUnselectedTexture, ResourceLocation bottomUnselectedTexture, ResourceLocation bottomLastUnselectedTexture) { // sprite
 				
 				this.tabTopFirstSelectedTexture = topFirstSelectedTexture;
 				this.tabTopSelectedTexture = topSelectedTexture;
@@ -112,17 +114,17 @@ public class ItemSubGroup extends ItemGroup {
 		
 	}
 	
-	public static final Identifier SUBTAB_SELECTED_TEXTURE = new Identifier("fractal", "container/creative_inventory/subtab_selected");
-	public static final Identifier SUBTAB_UNSELECTED_TEXTURE = new Identifier("fractal", "container/creative_inventory/subtab_unselected");
+	public static final ResourceLocation SUBTAB_SELECTED_TEXTURE = new ResourceLocation("fractal", "container/creative_inventory/subtab_selected");
+	public static final ResourceLocation SUBTAB_UNSELECTED_TEXTURE = new ResourceLocation("fractal", "container/creative_inventory/subtab_unselected");
 	
 	public static final Style VANILLA_STYLE = new Style.Builder().build();
 	
-	protected ItemSubGroup(ItemGroup parent, Text displayName, EntryCollector entryCollector) {
+	protected ItemSubGroup(CreativeModeTab parent, Component displayName, DisplayItemsGenerator entryCollector) {
 		this(parent, displayName, entryCollector, VANILLA_STYLE);
 	}
 	
-	protected ItemSubGroup(ItemGroup parent, Text displayName, EntryCollector entryCollector, Style style) {
-		super(parent.getRow(), parent.getColumn(), parent.getType(), displayName, () -> ItemStack.EMPTY, entryCollector);
+	protected ItemSubGroup(CreativeModeTab parent, Component displayName, DisplayItemsGenerator entryCollector, Style style) {
+		super(getBuilder(parent, displayName, entryCollector));
 		this.style = style;
 		this.parent = parent;
 		ItemGroupParent igp = (ItemGroupParent) parent;
@@ -132,26 +134,30 @@ public class ItemSubGroup extends ItemGroup {
 			igp.fractal$setSelectedChild(this);
 		}
 	}
+
+	private static CreativeModeTab.Builder getBuilder(CreativeModeTab parent, Component displayName, DisplayItemsGenerator entryCollector) {
+		return CreativeModeTab.builder(parent.row(), parent.column()).title(displayName).icon(() -> ItemStack.EMPTY).displayItems(entryCollector);
+	}
 	
 	/**
 	 * 100 % the vanilla code, but the check for registered item groups was removed
 	 * (we do not want to register our subgroups, so other mods do not pick them up)
 	 */
 	@Override
-	public void updateEntries(DisplayContext displayContext) {
-		EntriesImpl entriesImpl = new EntriesImpl(this, displayContext.enabledFeatures);
-		this.entryCollector.accept(displayContext, entriesImpl);
-		this.displayStacks = entriesImpl.parentTabStacks;
-		this.searchTabStacks = entriesImpl.searchTabStacks;
-		this.reloadSearchProvider();
+	public void buildContents(ItemDisplayParameters displayContext) {
+		ItemDisplayBuilder entriesImpl = new ItemDisplayBuilder(this, displayContext.enabledFeatures());
+		this.displayItemsGenerator.accept(displayContext, entriesImpl);
+		this.displayItems = entriesImpl.tabContents;
+		this.displayItemsSearchTab = entriesImpl.searchTabContents;
+		this.rebuildSearchTree();
 	}
 	
 	@Override
-	public ItemStack getIcon() {
+	public ItemStack getIconItem() {
 		return ItemStack.EMPTY;
 	}
 	
-	public ItemGroup getParent() {
+	public CreativeModeTab getParent() {
 		return parent;
 	}
 	
@@ -165,12 +171,12 @@ public class ItemSubGroup extends ItemGroup {
 	
 	public static class Builder {
 		
-		protected ItemGroup parent;
-		protected Text displayName;
+		protected CreativeModeTab parent;
+		protected Component displayName;
 		protected Style style;
-		private EntryCollector entryCollector;
+		private DisplayItemsGenerator entryCollector;
 		
-		public Builder(ItemGroup parent, Text displayName) {
+		public Builder(CreativeModeTab parent, Component displayName) {
 			this.parent = parent;
 			this.displayName = displayName;
 		}
@@ -180,7 +186,7 @@ public class ItemSubGroup extends ItemGroup {
 			return this;
 		}
 		
-		public Builder entries(EntryCollector entryCollector) {
+		public Builder entries(DisplayItemsGenerator entryCollector) {
 			this.entryCollector = entryCollector;
 			return this;
 		}

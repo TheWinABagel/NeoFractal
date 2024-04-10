@@ -2,7 +2,7 @@ package de.dafuqs.fractal.interfaces;
 
 import de.dafuqs.fractal.api.*;
 
-import java.util.*;
+import java.util.List;
 
 public interface ItemGroupParent {
 	
