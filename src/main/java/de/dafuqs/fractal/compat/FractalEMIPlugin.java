@@ -7,6 +7,7 @@ import dev.emi.emi.api.widget.*;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.world.item.CreativeModeTab;
 
+@EmiEntrypoint
 public class FractalEMIPlugin implements EmiPlugin {
 	
 	@Override
