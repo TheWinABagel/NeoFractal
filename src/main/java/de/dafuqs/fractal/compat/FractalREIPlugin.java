@@ -5,11 +5,13 @@ import de.dafuqs.fractal.mixin.client.*;
 import me.shedaniel.math.*;
 import me.shedaniel.rei.api.client.plugins.*;
 import me.shedaniel.rei.api.client.registry.screen.*;
+import me.shedaniel.rei.forge.REIPluginClient;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.world.item.CreativeModeTab;
 
 import java.util.List;
 
+@REIPluginClient
 public class FractalREIPlugin implements REIClientPlugin {
 	
 	@Override
