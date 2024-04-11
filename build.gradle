@@ -26,6 +26,9 @@ repositories {
             includeGroup 'dev.architectury'
         }
     }
+    maven {
+        url "https://maven.blamejared.com/"
+    }
 }
 
 dependencies {
@@ -39,12 +42,15 @@ dependencies {
     // https://github.com/emilyploszaj/emi
     compileOnly "dev.emi:emi-neoforge:${emi_version}"
 
+    compileOnly("mezz.jei:jei-1.20.4-common-api:${jei_version}")
+    compileOnly "mezz.jei:jei-1.20.4-neoforge-api:${jei_version}"
+
     switch (recipe_viewer.toLowerCase(Locale.ROOT)) {
         case "rei": runtimeOnly("me.shedaniel:RoughlyEnoughItems-neoforge:$rei_version"); break
         case "emi": runtimeOnly("dev.emi:emi-neoforge:${emi_version}"); break
-        case "jei": runtimeOnly("dev.emi:emi-neo:${emi_version}"); break
+        case "jei": runtimeOnly("mezz.jei:jei-1.20.4-neoforge:${jei_version}"); break
         case "disabled": break
-        default: println("Unknown recipe viewer specified: $recipe_viewer. Must be EMI, REI or disabled.")
+        default: println("Unknown recipe viewer specified: $recipe_viewer. Must be EMI, REI, JEI or disabled.")
     }
 }
 
