@@ -26,30 +26,30 @@ import java.util.List;
 @OnlyIn(Dist.CLIENT)
 @Mixin(CreativeModeInventoryScreen.class)
 public abstract class CreativeInventoryScreenAddTabsMixin extends EffectRenderingInventoryScreen<ItemPickerMenu> implements SubTabLocation, CreativeInventoryScreenAccessor {
-
+	
 	@Unique
 	private static final int LAST_TAB_INDEX_RENDERING_LEFT = 11;
-
+	
 	@Unique
 	private static final ResourceLocation SUBTAB_TEXTURE = new ResourceLocation("fractal", "textures/subtab.png");
 	@Unique
 	private static final ResourceLocation TINYFONT_TEXTURE = new ResourceLocation("fractal", "textures/tinyfont.png");
-
+	
 	public CreativeInventoryScreenAddTabsMixin(ItemPickerMenu screenHandler, Inventory playerInventory, Component text) {
 		super(screenHandler, playerInventory, text);
 	}
-
+	
 	@Shadow
 	private float scrollOffs;
-
+	
 	@Shadow
 	private static CreativeModeTab selectedTab;
-
+	
 	@Unique
 	private int fractal$y; // tab start y
 	private int fractal$x, fractal$h; // left tabs
 	private int fractal$x2, fractal$h2; // right tabs
-
+	
 	@Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;renderTooltip(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;II)V"))
 	public void fractal$render(GuiGraphics context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
 		if (selectedTab instanceof ItemGroupParent parent && parent.fractal$getChildren() != null && !parent.fractal$getChildren().isEmpty()) {
@@ -65,7 +65,7 @@ public abstract class CreativeInventoryScreenAddTabsMixin extends EffectRenderin
 			int[] pos = {this.leftPos, this.topPos + 6};
 			int tabStartOffset = 68;
 			int tabWidth = 72;
-
+			
 			fractal$x = pos[0] - tabWidth;
 			fractal$y = pos[1];
 			fractal$x2 = pos[0] + 259;
@@ -73,7 +73,7 @@ public abstract class CreativeInventoryScreenAddTabsMixin extends EffectRenderin
 			List<ItemSubGroup> children =  parent.fractal$getChildren();
 			for (ItemSubGroup child : children) {
 				boolean thisChildSelected = child == parent.fractal$getSelectedChild();
-
+				
 				context.setColor(1, 1, 1, 1);
 				if (child.getBackgroundTexture() == null) {
 					int bgV = (thisChildSelected ? 11 : 0) + (rendersOnTheRight ? 22 : 0);
@@ -82,10 +82,10 @@ public abstract class CreativeInventoryScreenAddTabsMixin extends EffectRenderin
 					int bgV = (thisChildSelected ? 136 + 11 : 136) + (rendersOnTheRight ? 22 : 0);
 					context.blit(child.getBackgroundTexture(),  pos[0] - tabStartOffset, pos[1], 24, bgV, tabWidth, 11, 256, 256);
 				}
-
+				
 				int textOffset = thisChildSelected ? 8 : 5; // makes the text pop slightly outwards
 				String tabDisplayName = child.getDisplayName().getString();
-
+				
 				if(rendersOnTheRight) {
 					context.drawManaged(() -> {
 						for (int i = 0; i < tabDisplayName.length(); i++) {
@@ -111,7 +111,7 @@ public abstract class CreativeInventoryScreenAddTabsMixin extends EffectRenderin
 						}
 					});
 				}
-
+				
 				int index = child.getIndexInParent();
 				if(index >= LAST_TAB_INDEX_RENDERING_LEFT) {
 					if(index == LAST_TAB_INDEX_RENDERING_LEFT) {
@@ -124,14 +124,14 @@ public abstract class CreativeInventoryScreenAddTabsMixin extends EffectRenderin
 				}
 				pos[1] += 10;
 			}
-
+			
 			fractal$h = 11 * Math.min(LAST_TAB_INDEX_RENDERING_LEFT + 1, children.size());
 			fractal$h2 = 11 * Math.max(0, children.size() - LAST_TAB_INDEX_RENDERING_LEFT - 1);
 
 			context.setColor(1, 1, 1, 1);
 		}
 	}
-
+	
 	@Inject(at = @At("HEAD"), method = "mouseClicked", cancellable = true)
 	public void fractal$mouseClicked(double mouseX, double mouseY, int button, CallbackInfoReturnable<Boolean> ci) {
 		CreativeModeTab selected = selectedTab;
@@ -142,17 +142,17 @@ public abstract class CreativeInventoryScreenAddTabsMixin extends EffectRenderin
 			for (ItemSubGroup child : parent.fractal$getChildren()) {
 				if (mouseX >= x && mouseX <= x + w && mouseY >= y && mouseY <= y + 11) {
 					parent.fractal$setSelectedChild(child);
-
+					
 					menu.items.clear();
 					menu.items.addAll(selected.getDisplayItems());
-
+					
 					this.scrollOffs = 0.0F;
 					menu.scrollTo(0.0F);
 					ci.setReturnValue(true);
 					return;
 				}
 				y += 10;
-
+				
 				if(child.getIndexInParent() == LAST_TAB_INDEX_RENDERING_LEFT) {
 					x += 259;
 					y = fractal$y;
@@ -160,30 +160,30 @@ public abstract class CreativeInventoryScreenAddTabsMixin extends EffectRenderin
 			}
 		}
 	}
-
+	
 	@Override
 	public int fractal$getX() {
 		return fractal$x;
 	}
-
+	
 	@Override
 	public int fractal$getY() {
 		return fractal$y;
 	}
-
+	
 	@Override
 	public int fractal$getH() {
 		return fractal$h;
 	}
-
+	
 	@Override
 	public int fractal$getX2() {
 		return fractal$x2 - 72;
 	}
-
+	
 	@Override
 	public int fractal$getH2() {
 		return fractal$h2;
 	}
-
+	
 }

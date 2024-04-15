@@ -1,17 +1,18 @@
 package de.dafuqs.fractal.compat;
 
-import de.dafuqs.fractal.interfaces.*;
-import de.dafuqs.fractal.mixin.client.*;
+import de.dafuqs.fractal.interfaces.ItemGroupParent;
+import de.dafuqs.fractal.interfaces.SubTabLocation;
+import de.dafuqs.fractal.mixin.client.CreativeInventoryScreenAccessor;
 import me.shedaniel.math.*;
 import me.shedaniel.rei.api.client.plugins.*;
 import me.shedaniel.rei.api.client.registry.screen.*;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.world.item.CreativeModeTab;
 
-import java.util.*;
+import java.util.List;
 
 public class FractalREIPlugin implements REIClientPlugin {
-
+	
 	@Override
 	public void registerExclusionZones(ExclusionZones zones) {
 		zones.register(CreativeModeInventoryScreen.class, (screen) -> {
@@ -25,5 +26,5 @@ public class FractalREIPlugin implements REIClientPlugin {
 			return List.of();
 		});
 	}
-
+	
 }

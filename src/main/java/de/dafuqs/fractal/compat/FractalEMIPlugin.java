@@ -1,13 +1,13 @@
 package de.dafuqs.fractal.compat;
 
-import de.dafuqs.fractal.interfaces.*;
-import de.dafuqs.fractal.mixin.client.*;
+import de.dafuqs.fractal.interfaces.ItemGroupParent;
+import de.dafuqs.fractal.interfaces.SubTabLocation;
+import de.dafuqs.fractal.mixin.client.CreativeInventoryScreenAccessor;
 import dev.emi.emi.api.*;
 import dev.emi.emi.api.widget.*;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.world.item.CreativeModeTab;
 
-@EmiEntrypoint
 public class FractalEMIPlugin implements EmiPlugin {
 	
 	@Override

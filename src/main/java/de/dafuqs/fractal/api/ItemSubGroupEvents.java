@@ -1,5 +1,6 @@
 package de.dafuqs.fractal.api;
 
+import de.dafuqs.fractal.impl.ItemSubGroupEventsImpl;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.CreativeModeTab;
 
@@ -24,10 +25,10 @@ public final class ItemSubGroupEvents {
 	 * Returns the modify entries event for a specific item group. This uses the group ID and
 	 * is suitable for modifying a modded item group that might not exist.
 	 *
-//	 * @param identifier the {@link ResourceLocation} of the item group to modify
+	 * @param identifier the {@link ResourceLocation} of the item group to modify
 	 * @return the event
 	 */
-//	public static ModifyEntriesEvent modifyEntriesEvent(ResourceLocation identifier) {
+//	public static Event<ModifyEntries> modifyEntriesEvent(ResourceLocation identifier) {
 //		return ItemSubGroupEventsImpl.getOrCreateModifyEntriesEvent(identifier);
 //	}
 
@@ -36,7 +37,7 @@ public final class ItemSubGroupEvents {
 		/**
 		 * Modifies the item group entries.
 		 * @param entries the entries
-		 * @see CreativeModeTab.Output
+		 * @see FabricItemGroupEntries
 		 */
 		void modifyEntries(CreativeModeTab.Output entries);
 	}
@@ -47,7 +48,7 @@ public final class ItemSubGroupEvents {
 		 * Modifies the item group entries.
 		 * @param group the item group that is being modified
 		 * @param entries the entries
-		 * @see CreativeModeTab.Output
+		 * @see FabricItemGroupEntries
 		 */
 		void modifyEntries(ItemSubGroup group, CreativeModeTab.Output entries);
 	}
