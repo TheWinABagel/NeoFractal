@@ -2,7 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/fractal.iml" filepath="$PROJECT_DIR$/.idea/modules/fractal.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/NeoFractal.iml" filepath="$PROJECT_DIR$/.idea/modules/NeoFractal.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/NeoFractal.main.iml" filepath="$PROJECT_DIR$/.idea/modules/NeoFractal.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/NeoFractal.test.iml" filepath="$PROJECT_DIR$/.idea/modules/NeoFractal.test.iml" />
     </modules>
   </component>
 </project>

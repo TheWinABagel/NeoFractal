@@ -16,7 +16,8 @@ public class FractalEMIPlugin implements EmiPlugin {
 			if (screen != null) {
 				CreativeModeTab selected = CreativeInventoryScreenAccessor.fractal$getSelectedTab();
 				if (selected instanceof ItemGroupParent parent && screen instanceof SubTabLocation stl && parent.fractal$getChildren() != null && !parent.fractal$getChildren().isEmpty()) {
-					out.accept(new Bounds(stl.fractal$getX(), stl.fractal$getY(), stl.fractal$getW(), stl.fractal$getH()));
+					out.accept(new Bounds(stl.fractal$getX(), stl.fractal$getY(), 72, stl.fractal$getH()));
+					out.accept(new Bounds(stl.fractal$getX2(), stl.fractal$getY(), 72, stl.fractal$getH2()));
 				}
 			}
 		});

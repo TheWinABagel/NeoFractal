@@ -1,8 +1,8 @@
 package de.dafuqs.fractal.mixin.client;
 
-import de.dafuqs.fractal.api.*;
-import de.dafuqs.fractal.interfaces.*;
-
+import de.dafuqs.fractal.api.ItemSubGroup;
+import de.dafuqs.fractal.interfaces.ItemGroupParent;
+import de.dafuqs.fractal.interfaces.SubTabLocation;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen.ItemPickerMenu;
@@ -13,7 +13,6 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.CreativeModeTab;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -22,27 +21,36 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import java.util.List;
+
 @OnlyIn(Dist.CLIENT)
 @Mixin(CreativeModeInventoryScreen.class)
 public abstract class CreativeInventoryScreenAddTabsMixin extends EffectRenderingInventoryScreen<ItemPickerMenu> implements SubTabLocation, CreativeInventoryScreenAccessor {
-	
+
 	@Unique
-	private static ResourceLocation TINYFONT_TEXTURE = new ResourceLocation("fractal", "textures/gui/tinyfont.png");
-	
+	private static final int LAST_TAB_INDEX_RENDERING_LEFT = 11;
+
+	@Unique
+	private static final ResourceLocation SUBTAB_TEXTURE = new ResourceLocation("fractal", "textures/subtab.png");
+	@Unique
+	private static final ResourceLocation TINYFONT_TEXTURE = new ResourceLocation("fractal", "textures/tinyfont.png");
+
 	public CreativeInventoryScreenAddTabsMixin(ItemPickerMenu screenHandler, Inventory playerInventory, Component text) {
 		super(screenHandler, playerInventory, text);
 	}
-	
+
 	@Shadow
 	private float scrollOffs;
-	
+
 	@Shadow
 	private static CreativeModeTab selectedTab;
-	
+
 	@Unique
-	private int fractal$x, fractal$y, fractal$w, fractal$h;
-	
-	@Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/inventory/CreativeModeInventoryScreen;checkTabHovering(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/world/item/CreativeModeTab;II)Z"))
+	private int fractal$y; // tab start y
+	private int fractal$x, fractal$h; // left tabs
+	private int fractal$x2, fractal$h2; // right tabs
+
+	@Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;renderTooltip(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;II)V"))
 	public void fractal$render(GuiGraphics context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
 		if (selectedTab instanceof ItemGroupParent parent && parent.fractal$getChildren() != null && !parent.fractal$getChildren().isEmpty()) {
 			if (!selectedTab.showTitle()) {
@@ -53,84 +61,129 @@ public abstract class CreativeInventoryScreenAddTabsMixin extends EffectRenderin
 					x = context.drawString(font, child.getDisplayName(), x, this.topPos + 6, 4210752, false);
 				}
 			}
-			int ofs = 5;
-			int x = this.leftPos - ofs;
-			int y = this.topPos + 6;
-			int tw = 57;
-			fractal$x = x - tw;
-			fractal$y = y;
-			for (ItemSubGroup child : parent.fractal$getChildren()) {
-				context.setColor(1, 1, 1, 1);
-				
+
+			int[] pos = {this.leftPos, this.topPos + 6};
+			int tabStartOffset = 68;
+			int tabWidth = 72;
+
+			fractal$x = pos[0] - tabWidth;
+			fractal$y = pos[1];
+			fractal$x2 = pos[0] + 259;
+			boolean rendersOnTheRight = false;
+			List<ItemSubGroup> children =  parent.fractal$getChildren();
+			for (ItemSubGroup child : children) {
 				boolean thisChildSelected = child == parent.fractal$getSelectedChild();
-				@Nullable ItemSubGroup.Style style = child.getStyle();
-				@Nullable ResourceLocation subtabTextureID = style == null
-						? (thisChildSelected ? ItemSubGroup.SUBTAB_SELECTED_TEXTURE : ItemSubGroup.SUBTAB_UNSELECTED_TEXTURE)
-						: (thisChildSelected ? style.selectedSubtabTexture() : style.unselectedSubtabTexture());
-				
-				context.blitSprite(subtabTextureID, x - tw, y, 70, 11);
-				
-				String str = child.getDisplayName().getString();
-				for (int i = str.length() - 1; i >= 0; i--) {
-					char c = str.charAt(i);
-					if (c > 0x7F) continue;
-					int u = (c % 16) * 4;
-					int v = (c / 16) * 6;
-					context.setColor(0, 0, 0, 1);
-					context.blit(TINYFONT_TEXTURE, x, y + 3, u, v, 4, 6, 64, 48);
-					x -= 4;
+
+				context.setColor(1, 1, 1, 1);
+				if (child.getBackgroundTexture() == null) {
+					int bgV = (thisChildSelected ? 11 : 0) + (rendersOnTheRight ? 22 : 0);
+					context.blit(SUBTAB_TEXTURE, pos[0] - tabStartOffset, pos[1], 0, bgV, tabWidth, 11, tabWidth, 44);
+				} else {
+					int bgV = (thisChildSelected ? 136 + 11 : 136) + (rendersOnTheRight ? 22 : 0);
+					context.blit(child.getBackgroundTexture(),  pos[0] - tabStartOffset, pos[1], 24, bgV, tabWidth, 11, 256, 256);
 				}
-				x = this.leftPos - ofs;
-				y += 10;
+
+				int textOffset = thisChildSelected ? 8 : 5; // makes the text pop slightly outwards
+				String tabDisplayName = child.getDisplayName().getString();
+
+				if(rendersOnTheRight) {
+					context.drawManaged(() -> {
+						for (int i = 0; i < tabDisplayName.length(); i++) {
+							char c = tabDisplayName.charAt(i);
+							if (c > 0x7F) continue;
+							int u = (c % 16) * 4;
+							int v = (c / 16) * 6;
+							context.setColor(0, 0, 0, 1);
+							context.blit(TINYFONT_TEXTURE, pos[0] + 1 - tabStartOffset + textOffset, pos[1] + 3, u, v, 4, 6, 64, 48);
+							pos[0] += 4;
+						}
+					});
+				} else {
+					context.drawManaged(() -> {
+						for (int i = tabDisplayName.length() - 1; i >= 0; i--) {
+							char c = tabDisplayName.charAt(i);
+							if (c > 0x7F) continue;
+							int u = (c % 16) * 4;
+							int v = (c / 16) * 6;
+							context.setColor(0, 0, 0, 1);
+							context.blit(TINYFONT_TEXTURE, pos[0] - textOffset, pos[1] + 3, u, v, 4, 6, 64, 48);
+							pos[0] -= 4;
+						}
+					});
+				}
+
+				int index = child.getIndexInParent();
+				if(index >= LAST_TAB_INDEX_RENDERING_LEFT) {
+					if(index == LAST_TAB_INDEX_RENDERING_LEFT) {
+						rendersOnTheRight = true;
+						pos[1] -= 10 * (LAST_TAB_INDEX_RENDERING_LEFT + 1);
+					}
+					pos[0] = fractal$x2;
+				} else {
+					pos[0] = this.leftPos;
+				}
+				pos[1] += 10;
 			}
-			fractal$w = tw + ofs;
-			fractal$h = y - fractal$y;
+
+			fractal$h = 11 * Math.min(LAST_TAB_INDEX_RENDERING_LEFT + 1, children.size());
+			fractal$h2 = 11 * Math.max(0, children.size() - LAST_TAB_INDEX_RENDERING_LEFT - 1);
+
 			context.setColor(1, 1, 1, 1);
 		}
 	}
-	
+
 	@Inject(at = @At("HEAD"), method = "mouseClicked", cancellable = true)
 	public void fractal$mouseClicked(double mouseX, double mouseY, int button, CallbackInfoReturnable<Boolean> ci) {
 		CreativeModeTab selected = selectedTab;
 		if (selected instanceof ItemGroupParent parent && parent.fractal$getChildren() != null && !parent.fractal$getChildren().isEmpty()) {
 			int x = fractal$x;
 			int y = fractal$y;
-			int w = fractal$w;
+			int w = 77;
 			for (ItemSubGroup child : parent.fractal$getChildren()) {
 				if (mouseX >= x && mouseX <= x + w && mouseY >= y && mouseY <= y + 11) {
 					parent.fractal$setSelectedChild(child);
-					
+
 					menu.items.clear();
 					menu.items.addAll(selected.getDisplayItems());
-					
+
 					this.scrollOffs = 0.0F;
 					menu.scrollTo(0.0F);
 					ci.setReturnValue(true);
 					return;
 				}
 				y += 10;
+
+				if(child.getIndexInParent() == LAST_TAB_INDEX_RENDERING_LEFT) {
+					x += 259;
+					y = fractal$y;
+				}
 			}
 		}
 	}
-	
+
 	@Override
 	public int fractal$getX() {
 		return fractal$x;
 	}
-	
+
 	@Override
 	public int fractal$getY() {
 		return fractal$y;
 	}
-	
-	@Override
-	public int fractal$getW() {
-		return fractal$w;
-	}
-	
+
 	@Override
 	public int fractal$getH() {
 		return fractal$h;
 	}
-	
+
+	@Override
+	public int fractal$getX2() {
+		return fractal$x2 - 72;
+	}
+
+	@Override
+	public int fractal$getH2() {
+		return fractal$h2;
+	}
+
 }
