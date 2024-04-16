@@ -6,20 +6,16 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.CreativeModeTab.ItemDisplayBuilder;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemStackLinkedSet;
 import net.neoforged.fml.ModLoader;
 import net.neoforged.neoforge.common.util.MutableHashedLinkedMap;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
-import net.neoforged.neoforge.event.EventHooks;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
 
 public class ItemSubGroup extends CreativeModeTab {
 	
@@ -87,7 +83,7 @@ public class ItemSubGroup extends CreativeModeTab {
 
 		ModLoader.get().postEvent(new BuildCreativeModeTabContentsEvent(this, tabKey, params, entries));
 
-		final ItemSubGroupEvents.ModifyEntriesEvent modifyEntriesEvent = ItemSubGroupEvents.modifyEntriesEvent(identifier, output);
+		final ItemSubGroupEvents.ModifyEntriesEvent modifyEntriesEvent = new ItemSubGroupEvents.ModifyEntriesEvent(identifier, output);
 		ModLoader.get().postEvent(modifyEntriesEvent);
 
 		// Now trigger the global event
