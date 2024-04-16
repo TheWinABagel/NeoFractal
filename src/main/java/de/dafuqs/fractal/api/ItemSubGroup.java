@@ -9,6 +9,11 @@ import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTab.ItemDisplayBuilder;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackLinkedSet;
+import net.neoforged.fml.ModLoader;
+import net.neoforged.neoforge.common.util.MutableHashedLinkedMap;
+import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
+import net.neoforged.neoforge.event.EventHooks;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -53,56 +58,47 @@ public class ItemSubGroup extends CreativeModeTab {
 	@Override
 	public void buildContents(ItemDisplayParameters context) {
 		ItemDisplayBuilder entries = new ItemDisplayBuilder(this, context.enabledFeatures());
-		this.displayItemsGenerator.accept(context, entries);
 		this.displayItems = entries.tabContents;
 		this.displayItemsSearchTab = entries.searchTabContents;
-		
-		triggerEntryUpdateEvent(context);
+		final ResourceKey<CreativeModeTab> registryKey = BuiltInRegistries.CREATIVE_MODE_TAB.getResourceKey(parent).orElseThrow(() -> new IllegalStateException("Unregistered parent item group : " + parent));
+		onCreativeModeTabBuildContents(registryKey, this.displayItemsGenerator, context, entries);
 		
 		this.parent.displayItemsSearchTab.addAll(this.displayItemsSearchTab);
 		this.parent.displayItems.addAll(this.displayItems);
 		
 		this.rebuildSearchTree();
 	}
-	
-	// Custom impl of the default fabric event trigger at
-	// https://github.com/FabricMC/fabric/blob/95a137205b0b47b97b1ab35ac09a3430641137de/fabric-item-group-api-v1/src/main/java/net/fabricmc/fabric/mixin/itemgroup/ItemGroupMixin.java#L55
-	protected void triggerEntryUpdateEvent(ItemDisplayParameters context) {
-		final ResourceKey<CreativeModeTab> registryKey = BuiltInRegistries.CREATIVE_MODE_TAB.getResourceKey(parent).orElseThrow(() -> new IllegalStateException("Unregistered parent item group : " + parent));
-		
-		// Do not modify special item groups (except Operator Blocks) at all.
-		// Special item groups include Saved Hotbars, Search, and Survival Inventory.
-		// Note, search gets modified as part of the parent item group.
-		if (parent.isAlignedRight() && registryKey != CreativeModeTabs.OP_BLOCKS) return;
-		
-		// Sanity check for the injection point. It should be after these fields are set.
-		Objects.requireNonNull(displayItems, "displayStacks");
-		Objects.requireNonNull(displayItemsSearchTab, "searchTabStacks");
-		
-		// Convert the entries to lists
-		List<ItemStack> mutableDisplayStacks = new LinkedList<>(displayItems);
-		List<ItemStack> mutableSearchTabStacks = new LinkedList<>(displayItemsSearchTab);
-//		FabricItemGroupEntries entries = new FabricItemGroupEntries(context, mutableDisplayStacks, mutableSearchTabStacks); // scary ApiStatus.Internal usage
-//
-//		final Event<ItemSubGroupEvents.ModifyEntries> modifyEntriesEvent = ItemSubGroupEvents.modifyEntriesEvent(identifier);
-//
-//		if (modifyEntriesEvent != null) {
-//			modifyEntriesEvent.invoker().modifyEntries(entries);
-//		}
-//
-//		// Now trigger the global event
-//		if (registryKey != CreativeModeTabs.OP_BLOCKS || context.hasPermissions()) {
-//			ItemSubGroupEvents.MODIFY_ENTRIES_ALL.invoker().modifyEntries(this, entries);
-//		}
-		
-		// Convert the stacks back to sets after the events had a chance to modify them
-		displayItems.clear();
-		displayItems.addAll(mutableDisplayStacks);
-		
-		displayItemsSearchTab.clear();
-		displayItemsSearchTab.addAll(mutableSearchTabStacks);
+
+	//Custom impl of EventHooks#onCreativeModeTabBuildContents
+	public void onCreativeModeTabBuildContents(ResourceKey<CreativeModeTab> tabKey, CreativeModeTab.DisplayItemsGenerator originalGenerator, CreativeModeTab.ItemDisplayParameters params, CreativeModeTab.Output output) {
+		final var entries = new MutableHashedLinkedMap<ItemStack, CreativeModeTab.TabVisibility>(ItemStackLinkedSet.TYPE_AND_TAG,
+				(key, left, right) -> {
+					//throw new IllegalStateException("Accidentally adding the same item stack twice " + key.getDisplayName().getString() + " to a Creative Mode Tab: " + tab.getDisplayName().getString());
+					// Vanilla adds enchanting books twice in both visibilities.
+					// This is just code cleanliness for them. For us lets just increase the visibility and merge the entries.
+					return CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS;
+				});
+
+		originalGenerator.accept(params, (stack, vis) -> {
+			if (stack.getCount() != 1)
+				throw new IllegalArgumentException("The stack count must be 1");
+			entries.put(stack, vis);
+		});
+
+		ModLoader.get().postEvent(new BuildCreativeModeTabContentsEvent(this, tabKey, params, entries));
+
+		final ItemSubGroupEvents.ModifyEntriesEvent modifyEntriesEvent = ItemSubGroupEvents.modifyEntriesEvent(identifier, output);
+		ModLoader.get().postEvent(modifyEntriesEvent);
+
+		// Now trigger the global event
+		if (tabKey != CreativeModeTabs.OP_BLOCKS || params.hasPermissions()) {
+			ModLoader.get().postEvent(new ItemSubGroupEvents.ModifyEntriesAllEvent(this, output));
+		}
+
+		for (var entry : entries)
+			output.accept(entry.getKey(), entry.getValue());
 	}
-	
+
 	@Override
 	public ItemStack getIconItem() {
 		return ItemStack.EMPTY;

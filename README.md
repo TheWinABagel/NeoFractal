@@ -18,66 +18,62 @@ Fractal introduces item **subgroups for the creative menu**.
 ![Screenshots of the Creative Tabs](images/screenshot_vanilla_style.png)
 
 ```java
-public static final Identifier GROUP_ID = new Identifier("mymod", "main");
 
-public static final ItemGroup MAIN = FabricItemGroup.builder()
-		.icon(() -> new ItemStack(Blocks.REDSTONE_BLOCK))
-		.entries((displayContext, entries) -> entries.add(Items.APPLE))
-		.displayName(Text.translatable("mymod.1"))
-		.noRenderedName()
-		.build();
+public static final DeferredRegister<CreativeModeTab> TABS_REGISTER = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, "fractal");
 
-public static final ItemGroup EQUIPMENT = new ItemSubGroup.Builder(MAIN, Text.translatable("itemGroup.mymod.equipment")).entries((displayContext, entries) -> entries.add(Items.APPLE)).build();
-public static final ItemGroup FUNCTIONAL = new ItemSubGroup.Builder(MAIN, Text.translatable("itemGroup.mymod.functional")).styled(STYLE).entries((displayContext, entries) -> entries.add(Items.BAKED_POTATO)).build();
-public static final ItemGroup CUISINE = new ItemSubGroup.Builder(MAIN, Text.translatable("itemGroup.mymod.cuisine")).entries((displayContext, entries) -> entries.add(Items.CACTUS)).build();
-public static final ItemGroup RESOURCES = new ItemSubGroup.Builder(MAIN, Text.translatable("itemGroup.mymod.resources")).styled(STYLE).entries((displayContext, entries) -> entries.add(Items.DANDELION)).build();
+public static final DeferredHolder<CreativeModeTab, CreativeModeTab> MAIN = TABS_REGISTER.register("main_group", () -> CreativeModeTab.builder()
+        .icon(() -> new ItemStack(Blocks.REDSTONE_BLOCK))
+        .displayItems((displayContext, entries) -> {
+            entries.accept(Items.APPLE);
+            ItemGroupParent parent = (ItemGroupParent) Fractal.MAIN.get();
+            for (ItemSubGroup subGroup : parent.fractal$getChildren()) {
+                entries.acceptAll(subGroup.getSearchTabDisplayItems(), CreativeModeTab.TabVisibility.SEARCH_TAB_ONLY);
+            }
+        })
+        .title(Component.translatable("mymod.1"))
+        .hideTitle()
+        .build());
 
-@Override
-public void onInitialize() {
-    Registry.register(Registries.ITEM_GROUP, GROUP_ID, MAIN);
+//Do not register subgroups to the deferred register
+public static CreativeModeTab EQUIPMENT;
+public static CreativeModeTab FUNCTIONAL;
+public static CreativeModeTab CUISINE;
+public static CreativeModeTab RESOURCES;
+
+public ExapleModConstructor(IEventBus modBus) {
+    TABS_REGISTER.register(modBus);
+    modBus.addListener(this::onFMLCommonSetup);
+}
+
+@SubscribeEvent
+public void onFMLCommonSetup(FMLCommonSetupEvent e) {
+    //Statically setting this will result in an error
+    e.enqueueWork(() -> {
+        EQUIPMENT = new ItemSubGroup.Builder(MAIN.get(), new ResourceLocation("fractal:equipment"), Component.translatable("itemGroup.mymod.equipment")).entries((displayContext, entries) -> entries.accept(Items.APPLE)).build();
+        FUNCTIONAL = new ItemSubGroup.Builder(MAIN.get(), new ResourceLocation("fractal:functional"), Component.translatable("itemGroup.mymod.functional")).entries((displayContext, entries) -> entries.accept(Items.BAKED_POTATO)).build();
+        CUISINE = new ItemSubGroup.Builder(MAIN.get(), new ResourceLocation("fractal:cuisine"), Component.translatable("itemGroup.mymod.cuisine")).entries((displayContext, entries) -> entries.accept(Items.CACTUS)).build();
+        RESOURCES = new ItemSubGroup.Builder(MAIN.get(), new ResourceLocation("fractal:resources"), Component.translatable("itemGroup.mymod.resources")).entries((displayContext, entries) -> entries.accept(Items.DANDELION)).build();
+    });
 }
 ```
 
 ### Applying a custom style
-You are also able to apply a style to your ItemSubGroups, by supplying custom background, tab, subtab and scrollbar textures. You can even mix and match!
-In this example, the first two ItemSubGroups use a custom style by supplying texture files that are being shipped with your mod. The latter two tabs use the vanilla style.
+You are also able to apply a style to your ItemSubGroups, by supplying a custom texture that will be getting used as background for your subgroup. You can even mix and match!
+In this example, the first two ItemSubGroups use a custom style by supplying a texture file that is being shipped with your mod. The latter two tabs use the vanilla style.
+
+Just ship a modified [Texture Template](images/tabs_template.png) in your mods resources folder, and you are good to go!
 
 ![Screenshots of the Creative Tabs](images/screenshot_custom_style.png)
 
 ```java
-// Texture (put into \resources\assets\fractal\textures\gui\container\creative_inventory)
-public static final Identifier BACKGROUND_TEXTURE = new Identifier("fractal", "textures/gui/container/creative_inventory/custom_background.png");
+public static final Identifier ITEM_GROUP_BACKGROUND_TEXTURE_IDENTIFIER = new Identifier("mymod", "textures/item_group.png");
 
-// Sprites (put into \resources\assets\fractal\textures\gui\sprites\container\creative_inventory)
-public static final Identifier SCROLLBAR_ENABLED_TEXTURE = new Identifier("fractal", "container/creative_inventory/custom_scrollbar_enabled");
-public static final Identifier SCROLLBAR_DISABLED_TEXTURE = new Identifier("fractal", "container/creative_inventory/custom_scrollbar_disabled");
-
-public static final Identifier SUBTAB_SELECTED_TEXTURE = new Identifier("fractal", "container/creative_inventory/custom_subtab_selected");
-public static final Identifier SUBTAB_UNSELECTED_TEXTURE = new Identifier("fractal", "container/creative_inventory/custom_subtab_unselected");
-
-public static final Identifier TAB_TOP_FIRST_SELECTED_TEXTURE = new Identifier("fractal", "container/creative_inventory/custom_tab_top_first_selected");
-public static final Identifier TAB_TOP_SELECTED_TEXTURE = new Identifier("fractal", "container/creative_inventory/custom_tab_top_selected");
-public static final Identifier TAB_TOP_LAST_SELECTED_TEXTURE = new Identifier("fractal", "container/creative_inventory/custom_tab_top_last_selected");
-public static final Identifier TAB_TOP_FIRST_UNSELECTED_TEXTURE = new Identifier("fractal", "container/creative_inventory/custom_tab_top_first_unselected");
-public static final Identifier TAB_TOP_UNSELECTED_TEXTURE = new Identifier("fractal", "container/creative_inventory/custom_tab_top_unselected");
-public static final Identifier TAB_TOP_LAST_UNSELECTED_TEXTURE = new Identifier("fractal", "container/creative_inventory/custom_tab_top_last_unselected");
-public static final Identifier TAB_BOTTOM_FIRST_SELECTED_TEXTURE = new Identifier("fractal", "container/creative_inventory/custom_tab_bottom_first_selected");
-public static final Identifier TAB_BOTTOM_SELECTED_TEXTURE = new Identifier("fractal", "container/creative_inventory/custom_tab_bottom_selected");
-public static final Identifier TAB_BOTTOM_LAST_SELECTED_TEXTURE = new Identifier("fractal", "container/creative_inventory/custom_tab_bottom_last_selected");
-public static final Identifier TAB_BOTTOM_FIRST_UNSELECTED_TEXTURE = new Identifier("fractal", "container/creative_inventory/custom_tab_bottom_first_unselected");
-public static final Identifier TAB_BOTTOM_UNSELECTED_TEXTURE = new Identifier("fractal", "container/creative_inventory/custom_tab_bottom_unselected");
-public static final Identifier TAB_BOTTOM_LAST_UNSELECTED_TEXTURE = new Identifier("fractal", "container/creative_inventory/custom_tab_bottom_last_unselected");
-
-public static final ItemSubGroup.Style STYLE = new ItemSubGroup.Style.Builder()
-        .background(BACKGROUND_TEXTURE)
-        .scrollbar(SCROLLBAR_ENABLED_TEXTURE, SCROLLBAR_DISABLED_TEXTURE)
-        .subtab(SUBTAB_SELECTED_TEXTURE, SUBTAB_UNSELECTED_TEXTURE)
-        .tab(TAB_TOP_FIRST_SELECTED_TEXTURE, TAB_TOP_SELECTED_TEXTURE, TAB_TOP_LAST_SELECTED_TEXTURE, TAB_TOP_FIRST_UNSELECTED_TEXTURE, TAB_TOP_UNSELECTED_TEXTURE, TAB_TOP_LAST_UNSELECTED_TEXTURE,
-                TAB_BOTTOM_FIRST_SELECTED_TEXTURE, TAB_BOTTOM_SELECTED_TEXTURE, TAB_BOTTOM_LAST_SELECTED_TEXTURE, TAB_BOTTOM_FIRST_UNSELECTED_TEXTURE, TAB_BOTTOM_UNSELECTED_TEXTURE, TAB_BOTTOM_LAST_UNSELECTED_TEXTURE)
-        .build();
-
-public static final ItemGroup EQUIPMENT = new ItemSubGroup.Builder(MAIN, Text.translatable("itemGroup.mymod.equipment")).styled(STYLE).entries((displayContext, entries) -> entries.add(Items.APPLE)).build();
-public static final ItemGroup FUNCTIONAL = new ItemSubGroup.Builder(MAIN, Text.translatable("itemGroup.mymod.functional")).styled(STYLE).entries((displayContext, entries) -> entries.add(Items.BAKED_POTATO)).build();
-public static final ItemGroup CUISINE = new ItemSubGroup.Builder(MAIN, Text.translatable("itemGroup.mymod.cuisine")).entries((displayContext, entries) -> entries.add(Items.CACTUS)).build();
-public static final ItemGroup RESOURCES = new ItemSubGroup.Builder(MAIN, Text.translatable("itemGroup.mymod.resources")).entries((displayContext, entries) -> entries.add(Items.DANDELION)).build();
+public static final ItemGroup EQUIPMENT = new ItemSubGroup.Builder(MAIN, Text.translatable("itemGroup.mymod.equipment")).backgroundTexture(ITEM_GROUP_BACKGROUND_TEXTURE_IDENTIFIER).entries((displayContext, entries) -> entries.add(I1)).build();
+public static final ItemGroup FUNCTIONAL = new ItemSubGroup.Builder(MAIN, Text.translatable("itemGroup.mymod.functional")).backgroundTexture(ITEM_GROUP_BACKGROUND_TEXTURE_IDENTIFIER).entries((displayContext, entries) -> entries.add(I2)).build();
+public static final ItemGroup CUISINE = new ItemSubGroup.Builder(MAIN, Text.translatable("itemGroup.mymod.cuisine")).entries((displayContext, entries) -> entries.add(I3)).build();
+public static final ItemGroup RESOURCES = new ItemSubGroup.Builder(MAIN, Text.translatable("itemGroup.mymod.resources")).entries((displayContext, entries) -> entries.add(I4)).build();
 ```
+
+### Adding items to existing ItemSubGroups
+
+There exists an API for that! `ItemSubGroupEvents.modifyEntriesEvent(<Identifier of the Subtab you want to modify)` behaves exactly like its Fabric API counterpart, but targets ItemSubGroups instead of ItemGroups (it needs to be a separate event, since ItemSubGroups are not registered item groups, having no RegistryEntry that the Fabric API version targets)

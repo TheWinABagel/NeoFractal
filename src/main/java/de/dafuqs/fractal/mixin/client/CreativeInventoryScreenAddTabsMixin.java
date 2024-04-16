@@ -47,10 +47,12 @@ public abstract class CreativeInventoryScreenAddTabsMixin extends EffectRenderin
 	
 	@Unique
 	private int fractal$y; // tab start y
+	@Unique
 	private int fractal$x, fractal$h; // left tabs
+	@Unique
 	private int fractal$x2, fractal$h2; // right tabs
 	
-	@Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;renderTooltip(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;II)V"))
+	@Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/inventory/CreativeModeInventoryScreen;renderTooltip(Lnet/minecraft/client/gui/GuiGraphics;II)V"))
 	public void fractal$render(GuiGraphics context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
 		if (selectedTab instanceof ItemGroupParent parent && parent.fractal$getChildren() != null && !parent.fractal$getChildren().isEmpty()) {
 			if (!selectedTab.showTitle()) {
